@@ -46,23 +46,27 @@ padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;dis
 .giocatore svg{width:100%;max-width:190px;height:auto;display:block;margin-bottom:.4rem}
 .giocatore h3{font-size:clamp(1.45rem,6vw,1.9rem);font-weight:700;letter-spacing:.03em;text-wrap:balance}
 .anagrafe{margin:0;color:var(--grigio);font-size:.9rem}
-.giocatore .todo{margin-top:.5rem}
-.staff{margin-top:2rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem 1.2rem;padding:1.2rem 1.4rem;border:2px solid var(--verde);border-radius:6px;background:var(--carta)}
-.staff .ruolo{color:var(--erba);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.9rem}
-.staff h3{font-size:2rem;font-weight:700}
+.giocatore .ruolo-tag{margin-top:.5rem;color:var(--erba);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;border:1px solid currentColor;border-radius:4px;padding:.1rem .5rem}
 
 /* Testo stampato sulla maglia */
 .m-nome{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:700;font-size:17px;letter-spacing:.06em;fill:#fff;text-anchor:middle}
 .m-num{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:900;font-size:96px;fill:#fff;text-anchor:middle}
 
 /* PARTITE */
-.match{display:grid;grid-template-columns:9rem 1fr auto;gap:1rem;align-items:baseline;padding:1.2rem 0;border-top:2px solid var(--verde)}
+.calendario{list-style:none;margin:0;padding:0}
+.match{display:grid;grid-template-columns:11rem 1fr auto;gap:.3rem 1rem;align-items:baseline;padding:1.2rem 0;border-top:2px solid var(--verde)}
 .match:last-child{border-bottom:2px solid var(--verde)}
-.match .quando{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:700;font-size:1.5rem}
+.match time{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:700;font-size:1.5rem}
 .match b{font-weight:600;font-size:1.2rem}
-.match .dove{color:var(--grigio)}
-.match .todo{font-family:Barlow,system-ui,sans-serif;font-size:.9rem}
-@media(max-width:560px){.match{grid-template-columns:1fr;gap:.4rem}}
+.match .ris{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:900;font-size:1.6rem;color:var(--erba);margin:0 .3em}
+.stato:empty{display:none}
+.stato{font-weight:600;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--grigio)}
+.stato.esito{color:var(--erba)}
+.stato.oggi{color:var(--nero);background:var(--erba);padding:.15rem .55rem;border-radius:4px}
+.marcatori{grid-column:2/-1;margin:0;color:var(--grigio);font-size:.95rem}
+.match.giocata time{color:var(--grigio)}
+.bilancio{margin:-2rem 0 2rem;font-weight:600;color:var(--erba)}
+@media(max-width:560px){.match{grid-template-columns:1fr auto}.match b{grid-column:1/-1;grid-row:2}.marcatori{grid-column:1/-1}}
 
 /* FOTO */
 .foto{margin:0;border:2px solid var(--verde);background:var(--carta)}
@@ -71,4 +75,27 @@ padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;dis
 footer{padding:3rem 1.2rem 4rem;text-align:center;background:var(--verde);color:var(--nero);font-weight:600}
 footer img{width:84px;height:84px;display:block;margin:0 auto 1rem}
 
-@media(prefers-reduced-motion:reduce){.hero{--p:1;height:100svh}.scrollhint{display:none}}
+
+/* COMPARSE ALLO SCORRIMENTO: valgono solo se script.js aggiunge .anim (JS attivo e movimento non ridotto) */
+main{overflow-x:clip}
+.anim .reveal{opacity:0;transition:opacity .6s ease,transform .8s cubic-bezier(.2,.8,.2,1);transition-delay:var(--ritardo,0ms)}
+.anim .giocatore.reveal{transform:translate(var(--da-x,0),var(--da-y,40px)) rotate(var(--giro,0deg))}
+.anim .kit figure.reveal{transform:translateX(-60px) rotate(-6deg)}
+.anim .kit p.reveal,.anim .lead.reveal,.anim .bilancio.reveal{transform:translateY(24px)}
+.anim .match.reveal{transform:translateX(-48px)}
+.anim .reveal.visto{opacity:1;transform:none}
+/* sotto i titoli una fascia a strisce verdi che si allunga, come lo scudo */
+h2::after{content:"";display:block;height:.14em;width:min(100%,5em);margin-top:.18em;
+background:repeating-linear-gradient(90deg,var(--verde) 0 .45em,transparent .45em .9em);transform-origin:left;transition:transform .9s cubic-bezier(.2,.8,.2,1) .15s}
+.anim h2.reveal:not(.visto)::after{transform:scaleX(0)}
+.anim h2.reveal{opacity:1;transform:none}
+/* sulla foto le strisce dello scudo si aprono come un sipario */
+.foto{position:relative;overflow:hidden}
+.tende{display:none}
+.anim .tende{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);pointer-events:none}
+.tende i{background:var(--nero);transform-origin:top;transition:transform .9s cubic-bezier(.7,0,.2,1);transition-delay:calc(var(--i) * 60ms)}
+.tende i:nth-child(even){background:var(--verde);transform-origin:bottom}
+.foto.visto .tende i{transform:scaleY(0)}
+
+@media(prefers-reduced-motion:reduce){.hero{--p:1;height:100svh}.scrollhint{display:none}
+.anim .reveal{opacity:1;transform:none;transition:none}.anim .tende{display:none}h2::after{transition:none;transform:none!important}}
