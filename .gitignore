@@ -1,0 +1,4 @@
+.DS_Store
+.claude/
+# originali ad alta risoluzione: le versioni web sono in assets/ (rigenerabili con tools/prep_images.py)
+asset/

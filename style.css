@@ -1,0 +1,74 @@
+:root{--nero:#000;--verde:#028947;--maglia:#127a3e;--erba:#1fcf6a;--bianco:#f7f5ef;--grigio:#a9b3ad;--carta:#0d1511;--todo:#ffd400;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--nero)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--nero);color:var(--bianco);font:400 1.05rem/1.55 Barlow,system-ui,sans-serif}
+h1,h2,h3,.num{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:900;margin:0;line-height:.95}
+img{max-width:100%;height:auto}
+:focus-visible{outline:3px solid var(--erba);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* Segnaposto: dati che mancano, da compilare */
+.todo{display:inline-block;border:2px dashed var(--todo);color:var(--todo);padding:.15rem .55rem;border-radius:4px;font-weight:600;font-size:.9rem;line-height:1.35}
+
+/* HERO: le strisce dello scudo si chiudono mentre scorri */
+.hero{--p:0;height:230vh;background:var(--verde)}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
+.bars{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr)}
+.bars i{background:var(--nero);transform:scaleY(var(--p));transform-origin:top}
+.bars i:nth-child(even){transform-origin:bottom}
+.stage picture{position:relative;z-index:2;display:block;line-height:0}
+.logo{position:relative;z-index:2;height:min(80svh,92vw);width:auto;aspect-ratio:1;
+transform:translateY(calc(var(--p) * -15svh)) scale(calc(1 - var(--p) * .55))}
+.tagline{position:absolute;z-index:2;left:0;right:0;bottom:11svh;text-align:center;padding:0 1.5rem;
+opacity:clamp(0,calc((var(--p) - .6) * 3),1)}
+.tagline h1{font-size:clamp(2.4rem,8vw,5.5rem);letter-spacing:.01em}
+.tagline p{margin:.8rem 0 0;color:var(--grigio)}
+.scrollhint{position:absolute;z-index:2;bottom:max(1.2rem,env(safe-area-inset-bottom,0px));left:50%;translate:-50% 0;
+font-weight:600;color:var(--nero);opacity:calc(1 - var(--p) * 6)}
+
+section{padding:clamp(4rem,10vw,8rem) max(clamp(1rem,5vw,4rem),env(safe-area-inset-left,0px));max-width:1200px;margin:0 auto}
+h2{font-size:clamp(2.6rem,7vw,5rem);margin-bottom:.4em}
+.lead{max-width:56ch;color:var(--grigio);margin:0 0 3rem}
+
+/* LA MAGLIA: fronte e retro */
+.kit{display:grid;grid-template-columns:minmax(0,200px) minmax(0,40ch);gap:clamp(1rem,4vw,3rem);align-items:center;margin:0 0 4rem}
+.kit p{margin:0;color:var(--grigio)}
+@media(max-width:480px){.kit{grid-template-columns:1fr;justify-items:center}.kit figure{width:min(100%,200px)}}
+.kit figure{margin:0;text-align:center;background:var(--carta);border:2px solid var(--verde);border-radius:6px 6px 22px 22px;padding:1rem}
+.kit svg{width:100%;height:auto;display:block}
+.kit figcaption{color:var(--grigio);font-weight:600;margin-top:.5rem}
+
+/* ROSA: schiene di maglia */
+.rosa{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:clamp(.7rem,3vw,1.2rem);margin:0;padding:0;list-style:none}
+.giocatore{background:var(--carta);border:2px solid var(--verde);border-radius:6px 6px 22px 22px;
+padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.25rem}
+.giocatore svg{width:100%;max-width:190px;height:auto;display:block;margin-bottom:.4rem}
+.giocatore h3{font-size:clamp(1.45rem,6vw,1.9rem);font-weight:700;letter-spacing:.03em;text-wrap:balance}
+.anagrafe{margin:0;color:var(--grigio);font-size:.9rem}
+.giocatore .todo{margin-top:.5rem}
+.staff{margin-top:2rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem 1.2rem;padding:1.2rem 1.4rem;border:2px solid var(--verde);border-radius:6px;background:var(--carta)}
+.staff .ruolo{color:var(--erba);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.9rem}
+.staff h3{font-size:2rem;font-weight:700}
+
+/* Testo stampato sulla maglia */
+.m-nome{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:700;font-size:17px;letter-spacing:.06em;fill:#fff;text-anchor:middle}
+.m-num{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:900;font-size:96px;fill:#fff;text-anchor:middle}
+
+/* PARTITE */
+.match{display:grid;grid-template-columns:9rem 1fr auto;gap:1rem;align-items:baseline;padding:1.2rem 0;border-top:2px solid var(--verde)}
+.match:last-child{border-bottom:2px solid var(--verde)}
+.match .quando{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:700;font-size:1.5rem}
+.match b{font-weight:600;font-size:1.2rem}
+.match .dove{color:var(--grigio)}
+.match .todo{font-family:Barlow,system-ui,sans-serif;font-size:.9rem}
+@media(max-width:560px){.match{grid-template-columns:1fr;gap:.4rem}}
+
+/* FOTO */
+.foto{margin:0;border:2px solid var(--verde);background:var(--carta)}
+.foto img{display:block;width:100%;height:auto}
+
+footer{padding:3rem 1.2rem 4rem;text-align:center;background:var(--verde);color:var(--nero);font-weight:600}
+footer img{width:84px;height:84px;display:block;margin:0 auto 1rem}
+
+@media(prefers-reduced-motion:reduce){.hero{--p:1;height:100svh}.scrollhint{display:none}}

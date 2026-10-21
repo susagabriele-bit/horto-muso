@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Horto Muso · Calcio a 5</title>
+<meta name="description" content="Horto Muso, squadra di calcio a 5 della Mazzola Cup: rosa, calendario e foto di squadra.">
+<meta name="theme-color" content="#028947">
+<link rel="icon" href="assets/logo-192.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Disegni della divisa, riusati da tutte le maglie con <use> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="clip-maglia"><path d="M78 15 Q100 25 122 15 L152 24 Q172 32 192 64 L170 96 L156 86 L156 210 Q100 216 44 210 L44 86 L30 96 L8 64 Q28 32 48 24 Z"/></clipPath>
+    <linearGradient id="pieghe" x1="0" x2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".3"/>
+      <stop offset=".2" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".3"/>
+    </linearGradient>
+  </defs>
+  <symbol id="pantaloncini" viewBox="0 0 200 290">
+    <path d="M50 200 H150 L161 278 Q133 284 107 280 L100 246 L93 280 Q67 284 39 278 Z" fill="#050505" stroke="#fff" stroke-opacity=".2" stroke-width="1.5"/>
+  </symbol>
+  <!-- Retro: pannello nero sulla spalla destra di chi la indossa (a destra guardando la schiena) -->
+  <symbol id="maglia-retro" viewBox="0 0 200 290">
+    <use href="#pantaloncini"/>
+    <g clip-path="url(#clip-maglia)">
+      <rect width="200" height="220" fill="#127a3e"/>
+      <path d="M114 0 V18 Q140 50 158 92 H200 V0 Z" fill="#0a0a0a"/>
+      <path d="M114 18 Q140 50 158 92" fill="none" stroke="#3bbf72" stroke-width="1.6" opacity=".8"/>
+      <rect width="200" height="220" fill="url(#pieghe)"/>
+    </g>
+    <path d="M78 15 Q100 25 122 15 L126 19 Q100 33 74 19 Z" fill="#0a0a0a"/>
+    <path d="M78 15 Q100 25 122 15 L152 24 Q172 32 192 64 L170 96 L156 86 L156 210 Q100 216 44 210 L44 86 L30 96 L8 64 Q28 32 48 24 Z" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.2"/>
+  </symbol>
+  <!-- Fronte: stesso pannello, visto da davanti sta a sinistra; scollo a V nero -->
+  <symbol id="maglia-fronte" viewBox="0 0 200 290">
+    <use href="#pantaloncini"/>
+    <g clip-path="url(#clip-maglia)">
+      <rect width="200" height="220" fill="#127a3e"/>
+      <path d="M90 0 V26 Q62 50 42 92 H0 V0 Z" fill="#0a0a0a"/>
+      <path d="M90 26 Q62 50 42 92" fill="none" stroke="#3bbf72" stroke-width="1.6" opacity=".8"/>
+      <rect width="200" height="220" fill="url(#pieghe)"/>
+    </g>
+    <path d="M82 14 L100 40 L118 14 Q100 21 82 14 Z" fill="#0b4d27"/>
+    <path d="M76 14 L100 50 L124 14 L118 14 L100 40 L82 14 Z" fill="#0a0a0a"/>
+    <path d="M78 15 Q100 25 122 15 L152 24 Q172 32 192 64 L170 96 L156 86 L156 210 Q100 216 44 210 L44 86 L30 96 L8 64 Q28 32 48 24 Z" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.2"/>
+  </symbol>
+</svg>
+
+<header class="hero" id="top">
+  <div class="stage">
+    <div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <picture>
+      <source srcset="assets/logo.webp" type="image/webp">
+      <img class="logo" src="assets/logo.png" width="800" height="800" fetchpriority="high" alt="Stemma dell’Horto Muso: testa di cavallo con criniera verde su scudo a strisce nere e verdi, pallone in basso">
+    </picture>
+    <div class="tagline">
+      <h1>Horto Muso</h1>
+      <p>Calcio a 5 · Mazzola Cup. Cavalli di razza, scarpe da palestra.</p>
+    </div>
+    <div class="scrollhint">Scorri</div>
+  </div>
+</header>
+
+<main>
+<section id="rosa">
+  <h2>La rosa</h2>
+  <p class="lead">Tredici maglie, un solo cavallo.</p>
+
+  <div class="kit">
+    <figure>
+      <svg viewBox="0 0 200 290" role="img" aria-label="La divisa vista da davanti: maglia verde con pannello nero sulla spalla e scollo a V nero, pantaloncini neri"><use href="#maglia-fronte"/></svg>
+      <figcaption>La divisa</figcaption>
+    </figure>
+    <p>Maglia verde con pannello nero in diagonale sulla spalla e scollo a V nero, pantaloncini neri. Nome e numero bianchi sulla schiena.</p>
+  </div>
+
+  <ul class="rosa">
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 0, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">TARALLO</text><text class="m-num" x="100" y="170">0</text></svg>
+      <h3>Tarallo</h3>
+      <p class="anagrafe">Gentile Alessio</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 4, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">EL FRAQUITO</text><text class="m-num" x="100" y="170">4</text></svg>
+      <h3>El Fraquito</h3>
+      <p class="anagrafe">Chiarelli Alessandro</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 04, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">DI GIACOMO</text><text class="m-num" x="100" y="170">04</text></svg>
+      <h3>Di Giacomo</h3>
+      <p class="anagrafe">Di Giacomo Gabriele</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 7, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">AMPRINO</text><text class="m-num" x="100" y="170">7</text></svg>
+      <h3>Amprino</h3>
+      <p class="anagrafe">Amprino Matteo</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 8, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">PEZZO</text><text class="m-num" x="100" y="170">8</text></svg>
+      <h3>Pezzo</h3>
+      <p class="anagrafe">Pezzo Domenico</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 9, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">VERDIUS</text><text class="m-num" x="100" y="170">9</text></svg>
+      <h3>Verdius</h3>
+      <p class="anagrafe">Verde Cristian</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 10, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">FRANZOSO</text><text class="m-num" x="100" y="170">10</text></svg>
+      <h3>Franzoso</h3>
+      <p class="anagrafe">Franzoso Gabriele</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 11, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">PARATORE</text><text class="m-num" x="100" y="170">11</text></svg>
+      <h3>Paratore</h3>
+      <p class="anagrafe">Paratore Pietro</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 15, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">BRITONE</text><text class="m-num" x="100" y="170">15</text></svg>
+      <h3>Britone</h3>
+      <p class="anagrafe">Reis Brito Filipe</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 23, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">CAMINITI</text><text class="m-num" x="100" y="170">23</text></svg>
+      <h3>Caminiti</h3>
+      <p class="anagrafe">Salis Giuseppe</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 27, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">SUSA</text><text class="m-num" x="100" y="170">27</text></svg>
+      <h3>Susa</h3>
+      <p class="anagrafe">Susa Gabriele</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 67, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">METTIWS</text><text class="m-num" x="100" y="170">67</text></svg>
+      <h3>Mettiws</h3>
+      <p class="anagrafe">Salvalaggio Matteo</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+    <li class="giocatore">
+      <svg viewBox="0 0 200 290" role="img" aria-label="Maglia numero 89, retro"><use href="#maglia-retro"/><text class="m-nome" x="100" y="70">CICCIOGAMER</text><text class="m-num" x="100" y="170">89</text></svg>
+      <h3>Ciccio Gamer</h3>
+      <p class="anagrafe">Villano Giuliano</p>
+      <span class="todo">Ruolo: da inserire</span>
+    </li>
+  </ul>
+
+  <div class="staff">
+    <span class="ruolo">Allenatore</span>
+    <h3>Gargiso Andrea</h3>
+  </div>
+</section>
+
+<section id="partite">
+  <h2>Prossime partite</h2>
+  <p class="lead">Mazzola Cup. Il calendario non c’è ancora: date, avversari e campi sono da inserire.</p>
+  <div>
+    <div class="match"><span class="quando"><span class="todo">Data</span></span><b>Horto Muso – <span class="todo">Avversario</span></b><span class="dove"><span class="todo">Campo e ora</span></span></div>
+    <div class="match"><span class="quando"><span class="todo">Data</span></span><b><span class="todo">Avversario</span> – Horto Muso</b><span class="dove"><span class="todo">Campo e ora</span></span></div>
+    <div class="match"><span class="quando"><span class="todo">Data</span></span><b>Horto Muso – <span class="todo">Avversario</span></b><span class="dove"><span class="todo">Campo e ora</span></span></div>
+  </div>
+</section>
+
+<section id="foto">
+  <h2>La squadra</h2>
+  <figure class="foto">
+    <picture>
+      <source type="image/webp" srcset="assets/squadra-960.webp 960w, assets/squadra-1536.webp 1536w" sizes="(min-width: 1200px) 1068px, 92vw">
+      <img src="assets/squadra-960.jpg" srcset="assets/squadra-960.jpg 960w, assets/squadra-1536.jpg 1536w" sizes="(min-width: 1200px) 1068px, 92vw" width="1536" height="1152" loading="lazy" decoding="async" alt="La squadra nello spogliatoio: i giocatori sorridono e mostrano le maglie verdi e nere girate sul retro, con nomi e numeri bianchi.">
+    </picture>
+  </figure>
+</section>
+</main>
+
+<footer>
+  <picture>
+    <source srcset="assets/logo-192.webp" type="image/webp">
+    <img src="assets/logo-192.png" width="84" height="84" loading="lazy" alt="">
+  </picture>
+  Horto Muso · Calcio a 5 · Mazzola Cup
+</footer>
+
+<script src="script.js" defer></script>
+</body>
+</html>
