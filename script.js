@@ -46,6 +46,7 @@
       var f=+r.dataset.gf,s=+r.dataset.gs;
       g++;gf+=f;gs+=s;if(f>s)v++;else if(f===s)n++;else p++;
       r.classList.add('giocata');
+      if(stato){stato.className='stato esito'+(f<s?' persa':'');stato.textContent=f>s?'Vinta':f===s?'Pari':'Persa'}
       return;
     }
     var inizio=new Date(r.dataset.inizio);
