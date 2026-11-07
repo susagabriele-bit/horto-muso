@@ -92,7 +92,7 @@
   });
   document.querySelectorAll('.match').forEach(function(m,i){m.style.setProperty('--ritardo',i*70+'ms')});
 
-  var foto=document.querySelectorAll('.foto');
+  var foto=document.querySelectorAll('.carosello-finestra');
   foto.forEach(function(f){
     var tende=document.createElement('div');
     tende.className='tende';tende.setAttribute('aria-hidden','true');
@@ -109,4 +109,66 @@
     el.classList.add('reveal');oss.observe(el);
   });
   foto.forEach(function(f){oss.observe(f)});
+})();
+
+// CAROSELLO FOTO: si scorre col dito, con frecce e pallini; va avanti da solo finché nessuno lo tocca
+(function(){
+  var car=document.querySelector('.carosello');
+  if(!car)return;
+  var binario=car.querySelector('.carosello-binario');
+  var slide=binario.children,n=slide.length;
+  var punti=car.querySelector('.car-punti'),pausa=car.querySelector('.car-pausa');
+  var prec=car.querySelector('.car-prec'),succ=car.querySelector('.car-succ');
+  var ridotto=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var timer=null,fermo=ridotto,visibile=false,sopra=false,attuale=0;
+
+  function indice(){return Math.round(binario.scrollLeft/binario.clientWidth)}
+  function vai(i){
+    i=(i+n)%n;
+    binario.scrollTo({left:i*binario.clientWidth,behavior:ridotto?'auto':'smooth'});
+  }
+  var bottoni=[];
+  for(var i=0;i<n;i++){
+    var b=document.createElement('button');
+    b.type='button';b.setAttribute('aria-label','Foto '+(i+1)+' di '+n);
+    b.addEventListener('click',(function(k){return function(){tocco();vai(k)}})(i));
+    punti.appendChild(b);bottoni.push(b);
+  }
+  function segna(){
+    var k=attuale=indice();
+    bottoni.forEach(function(b,j){b.setAttribute('aria-current',j===k?'true':'false')});
+  }
+  var rinfresco=false;
+  binario.addEventListener('scroll',function(){
+    if(!rinfresco){rinfresco=true;requestAnimationFrame(function(){rinfresco=false;segna()})}
+  },{passive:true});
+
+  function ferma(){clearInterval(timer);timer=null}
+  function avvia(){
+    ferma();
+    if(!fermo&&visibile&&!sopra&&!document.hidden)timer=setInterval(function(){vai(indice()+1)},5000);
+  }
+  function etichetta(){pausa.textContent=fermo?'Avvia':'Pausa'}
+  // chi tocca il carosello prende il comando: lo scorrimento automatico si spegne
+  function tocco(){if(!fermo){fermo=true;etichetta();ferma()}}
+
+  prec.addEventListener('click',function(){tocco();vai(indice()-1)});
+  succ.addEventListener('click',function(){tocco();vai(indice()+1)});
+  pausa.addEventListener('click',function(){fermo=!fermo;etichetta();if(!fermo)vai(indice()+1);avvia()});
+  binario.addEventListener('pointerdown',tocco);
+  binario.addEventListener('wheel',function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY))tocco()},{passive:true});
+  binario.addEventListener('keydown',tocco);
+  car.addEventListener('mouseenter',function(){sopra=true;ferma()});
+  car.addEventListener('mouseleave',function(){sopra=false;avvia()});
+  car.addEventListener('focusin',function(){sopra=true;ferma()});
+  car.addEventListener('focusout',function(e){if(!car.contains(e.relatedTarget)){sopra=false;avvia()}});
+  document.addEventListener('visibilitychange',avvia);
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(v){visibile=v[0].isIntersecting;avvia()},{threshold:.5}).observe(car);
+  }else{visibile=true}
+  // se cambia la larghezza (telefono girato) resta sulla stessa foto
+  addEventListener('resize',function(){binario.scrollLeft=attuale*binario.clientWidth});
+
+  [prec,succ,car.querySelector('.carosello-comandi')].forEach(function(el){el.hidden=false});
+  etichetta();segna();avvia();
 })();

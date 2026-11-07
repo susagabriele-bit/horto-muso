@@ -70,11 +70,27 @@ padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;dis
 @media(max-width:560px){.match{grid-template-columns:1fr auto}.match b{grid-column:1/-1;grid-row:2}.marcatori{grid-column:1/-1}}
 
 /* FOTO */
-.galleria{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(.8rem,2.5vw,1.4rem)}
-.foto-grande{grid-column:1/-1}
-@media(max-width:640px){.galleria{grid-template-columns:1fr}}
-.foto{margin:0;border:2px solid var(--verde);background:var(--carta)}
-.foto img{display:block;width:100%;height:auto}
+/* Carosello: si scorre col dito (scroll-snap), frecce e pallini li accende script.js */
+.carosello [hidden]{display:none}
+.carosello-finestra{position:relative;overflow:hidden;border:2px solid var(--verde);background:var(--carta)}
+.carosello-binario{display:flex;margin:0;padding:0;list-style:none;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none}
+.carosello-binario::-webkit-scrollbar{display:none}
+.carosello-binario:focus-visible{outline-offset:-4px}
+.foto{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;margin:0;aspect-ratio:3/2}
+.foto img{display:block;width:100%;height:100%;object-fit:cover}
+.foto-spogliatoio img{object-position:center 25%}
+.car-freccia{position:absolute;z-index:3;top:50%;translate:0 -50%;width:2.75rem;height:2.75rem;padding:0;border:2px solid var(--verde);border-radius:50%;
+background:rgb(0 0 0/.6);color:var(--bianco);cursor:pointer;display:grid;place-items:center}
+.car-freccia svg{width:1.3rem;height:1.3rem;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.car-freccia:hover{background:var(--verde)}
+.car-prec{left:.6rem}.car-succ{right:.6rem}
+.carosello-comandi{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:.9rem}
+.car-punti{display:flex;gap:.25rem}
+.car-punti button{width:1.75rem;height:1.75rem;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.car-punti button::before{content:"";width:.7rem;height:.7rem;border-radius:50%;border:2px solid var(--verde);transition:background .2s,border-color .2s}
+.car-punti button[aria-current="true"]::before{background:var(--erba);border-color:var(--erba)}
+.car-pausa{font:600 .85rem Barlow,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--grigio);background:none;border:1px solid currentColor;border-radius:4px;padding:.35rem .7rem;min-height:1.75rem;cursor:pointer}
+.car-pausa:hover{color:var(--bianco)}
 
 footer{padding:3rem 1.2rem 4rem;text-align:center;background:var(--verde);color:var(--nero);font-weight:600}
 footer img{width:84px;height:84px;display:block;margin:0 auto 1rem}
@@ -93,13 +109,12 @@ h2::after{content:"";display:block;height:.14em;width:min(100%,5em);margin-top:.
 background:repeating-linear-gradient(90deg,var(--verde) 0 .45em,transparent .45em .9em);transform-origin:left;transition:transform .9s cubic-bezier(.2,.8,.2,1) .15s}
 .anim h2.reveal:not(.visto)::after{transform:scaleX(0)}
 .anim h2.reveal{opacity:1;transform:none}
-/* sulla foto le strisce dello scudo si aprono come un sipario */
-.foto{position:relative;overflow:hidden}
+/* sulle foto le strisce dello scudo si aprono come un sipario */
 .tende{display:none}
 .anim .tende{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr);pointer-events:none}
 .tende i{background:var(--nero);transform-origin:top;transition:transform .9s cubic-bezier(.7,0,.2,1);transition-delay:calc(var(--i) * 60ms)}
 .tende i:nth-child(even){background:var(--verde);transform-origin:bottom}
-.foto.visto .tende i{transform:scaleY(0)}
+.visto > .tende i{transform:scaleY(0)}
 
 @media(prefers-reduced-motion:reduce){.hero{--p:1;height:100svh}.scrollhint{display:none}
 .anim .reveal{opacity:1;transform:none;transition:none}.anim .tende{display:none}h2::after{transition:none;transform:none!important}}

@@ -218,25 +218,35 @@
 
 <section id="foto">
   <h2>La squadra</h2>
-  <div class="galleria">
-  <figure class="foto foto-grande">
-    <picture>
-      <source type="image/webp" srcset="assets/squadra-960.webp 960w, assets/squadra-1536.webp 1536w" sizes="(min-width: 1200px) 1068px, 92vw">
-      <img src="assets/squadra-960.jpg" srcset="assets/squadra-960.jpg 960w, assets/squadra-1536.jpg 1536w" sizes="(min-width: 1200px) 1068px, 92vw" width="1536" height="1152" loading="lazy" decoding="async" alt="La squadra nello spogliatoio: i giocatori sorridono e mostrano le maglie verdi e nere girate sul retro, con nomi e numeri bianchi.">
-    </picture>
-  </figure>
-  <figure class="foto">
-    <picture>
-      <source type="image/webp" srcset="assets/squadra-campo-1.webp">
-      <img src="assets/squadra-campo-1.jpg" width="650" height="433" loading="lazy" decoding="async" alt="La squadra in posa sul campo in erba sintetica, di sera sotto i fari: sette in piedi e tre accosciati davanti con il pallone, il portiere a sinistra con i guanti alza il pollice.">
-    </picture>
-  </figure>
-  <figure class="foto">
-    <picture>
-      <source type="image/webp" srcset="assets/squadra-campo-2.webp">
-      <img src="assets/squadra-campo-2.jpg" width="690" height="460" loading="lazy" decoding="async" alt="La squadra in posa davanti alla porta, in maglia verde e nera: una fila in piedi dietro e una accosciata davanti, uno con la fascia da capitano al braccio.">
-    </picture>
-  </figure>
+  <div class="carosello" role="region" aria-roledescription="carosello" aria-label="Foto di squadra">
+    <div class="carosello-finestra">
+      <ul class="carosello-binario" tabindex="0" aria-label="Foto: scorri di lato per vederle tutte">
+        <li class="foto foto-spogliatoio" aria-roledescription="foto" aria-label="1 di 3">
+          <picture>
+            <source type="image/webp" srcset="assets/squadra-960.webp 960w, assets/squadra-1536.webp 1536w" sizes="(min-width: 1200px) 1068px, 92vw">
+            <img src="assets/squadra-960.jpg" srcset="assets/squadra-960.jpg 960w, assets/squadra-1536.jpg 1536w" sizes="(min-width: 1200px) 1068px, 92vw" width="1536" height="1152" loading="lazy" decoding="async" alt="La squadra nello spogliatoio: i giocatori sorridono e mostrano le maglie verdi e nere girate sul retro, con nomi e numeri bianchi.">
+          </picture>
+        </li>
+        <li class="foto" aria-roledescription="foto" aria-label="2 di 3">
+          <picture>
+            <source type="image/webp" srcset="assets/squadra-campo-1.webp">
+            <img src="assets/squadra-campo-1.jpg" width="650" height="433" loading="lazy" decoding="async" alt="La squadra in posa sul campo in erba sintetica, di sera sotto i fari: sette in piedi e tre accosciati davanti con il pallone, il portiere a sinistra con i guanti alza il pollice.">
+          </picture>
+        </li>
+        <li class="foto" aria-roledescription="foto" aria-label="3 di 3">
+          <picture>
+            <source type="image/webp" srcset="assets/squadra-campo-2.webp">
+            <img src="assets/squadra-campo-2.jpg" width="690" height="460" loading="lazy" decoding="async" alt="La squadra in posa davanti alla porta, in maglia verde e nera: una fila in piedi dietro e una accosciata davanti, uno con la fascia da capitano al braccio.">
+          </picture>
+        </li>
+      </ul>
+      <button class="car-freccia car-prec" type="button" aria-label="Foto precedente" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="car-freccia car-succ" type="button" aria-label="Foto successiva" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="carosello-comandi" hidden>
+      <div class="car-punti"></div>
+      <button class="car-pausa" type="button">Pausa</button>
+    </div>
   </div>
 </section>
 </main>
