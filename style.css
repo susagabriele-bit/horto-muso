@@ -70,6 +70,9 @@ padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;dis
 @media(max-width:560px){.match{grid-template-columns:1fr auto}.match b{grid-column:1/-1;grid-row:2}.marcatori{grid-column:1/-1}}
 
 /* FOTO */
+.galleria{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(.8rem,2.5vw,1.4rem)}
+.foto-grande{grid-column:1/-1}
+@media(max-width:640px){.galleria{grid-template-columns:1fr}}
 .foto{margin:0;border:2px solid var(--verde);background:var(--carta)}
 .foto img{display:block;width:100%;height:auto}
 

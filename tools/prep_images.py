@@ -60,3 +60,17 @@ for width in (1536, 960):
     r.save(out / f"squadra-{width}.jpg", quality=80, optimize=True, progressive=True)
     r.save(out / f"squadra-{width}.webp", quality=78, method=6)
 print("foto", ph.size)
+
+# --- Foto al campo: ritagliate stringendo sulla squadra (box = sinistra, alto, destra, basso) ---
+RITAGLI = {
+    "squadra-campo-1": (185, 195, 835, 628),
+    "squadra-campo-2": (160, 135, 850, 595),
+}
+for name, box in RITAGLI.items():
+    sorgente = src / f"{name}.jpg"
+    if not sorgente.exists():
+        continue
+    r = Image.open(sorgente).convert("RGB").crop(box)
+    r.save(out / f"{name}.jpg", quality=84, optimize=True, progressive=True)
+    r.save(out / f"{name}.webp", quality=82, method=6)
+    print(name, r.size)

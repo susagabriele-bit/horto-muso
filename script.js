@@ -92,13 +92,13 @@
   });
   document.querySelectorAll('.match').forEach(function(m,i){m.style.setProperty('--ritardo',i*70+'ms')});
 
-  var foto=document.querySelector('.foto');
-  if(foto){
+  var foto=document.querySelectorAll('.foto');
+  foto.forEach(function(f){
     var tende=document.createElement('div');
     tende.className='tende';tende.setAttribute('aria-hidden','true');
     for(var i=0;i<10;i++){var b=document.createElement('i');b.style.setProperty('--i',i);tende.appendChild(b)}
-    foto.appendChild(tende);
-  }
+    f.appendChild(tende);
+  });
 
   var oss=new IntersectionObserver(function(voci){
     voci.forEach(function(v){
@@ -108,5 +108,5 @@
   document.querySelectorAll('main h2, main .lead, .kit figure, .kit p, .giocatore, .bilancio, .match').forEach(function(el){
     el.classList.add('reveal');oss.observe(el);
   });
-  if(foto)oss.observe(foto);
+  foto.forEach(function(f){oss.observe(f)});
 })();
