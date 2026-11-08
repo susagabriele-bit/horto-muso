@@ -13,7 +13,7 @@
   var linkScarica=document.getElementById('scarica');
   var stato=document.getElementById('stato');
   var logo=new Image();logo.src='assets/logo.png';
-  var partite=[],immagine=null,urlImmagine=null,nomeFile='horto-muso-storia.png';
+  var partite=[],classifica=[],aggiornata='',immagine=null,urlImmagine=null,nomeFile='horto-muso-storia.png';
 
   var giorno=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Rome'});
   var breve=new Intl.DateTimeFormat('it-IT',{weekday:'short',day:'numeric',month:'short',timeZone:'Europe/Rome'});
@@ -43,6 +43,17 @@
         gs:r.dataset.gs!=null?+r.dataset.gs:null,
         marcatori:m?m.textContent.replace(/^\s*Gol:\s*/i,'').trim():''
       };
+    });
+  }
+
+  function leggiClassifica(html){
+    var doc=new DOMParser().parseFromString(html,'text/html');
+    var t=doc.querySelector('#classifica time');
+    aggiornata=t?t.textContent.trim():'';
+    return [].map.call(doc.querySelectorAll('.classifica tbody tr'),function(r){
+      return {pos:r.cells[0].textContent.trim(),nome:r.querySelector('th').textContent.trim(),
+        pt:r.querySelector('.pt').textContent.trim(),g:r.cells[3].textContent.trim(),
+        dr:r.cells[9].textContent.trim(),noi:r.classList.contains('noi')};
     });
   }
 
@@ -132,7 +143,41 @@
     }
   }
 
+  function storiaClassifica(){
+    sfondo();
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    scritta('MAZZOLA CUP · GIRONE B',W/2,300,'600 {} '+TESTO,40,BIANCO,940,8);
+    scritta('CLASSIFICA',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
+    var x0=70,x1=W-70,top=540,h=Math.min(100,1060/Math.max(classifica.length,1));
+    ctx.textBaseline='middle';
+    // intestazione colonne
+    ctx.textAlign='right';
+    scritta('G',x1-150,top+20,'600 {} '+TESTO,30,GRIGIO,0,4);
+    scritta('PT',x1-20,top+20,'600 {} '+TESTO,30,GRIGIO,0,4);
+    top+=50;
+    classifica.forEach(function(s,i){
+      var y=top+i*h,cy=y+h/2;
+      if(s.noi){ctx.fillStyle=VERDE;ctx.fillRect(x0-20,y+4,x1-x0+40,h-8)}
+      else{ctx.fillStyle='rgba(2,137,71,.45)';ctx.fillRect(x0,y,x1-x0,2)}
+      ctx.textAlign='left';
+      scritta(s.pos,x0+4,cy+3,'900 {} '+TITOLO,58,s.noi?BIANCO:GRIGIO);
+      scritta(s.nome.toUpperCase(),x0+90,cy+3,'900 {} '+TITOLO,58,BIANCO,620,1);
+      ctx.textAlign='right';
+      scritta(s.g,x1-150,cy+3,'700 {} '+TITOLO,52,s.noi?BIANCO:GRIGIO);
+      scritta(s.pt,x1-20,cy+3,'900 {} '+TITOLO,64,s.noi?BIANCO:ERBA);
+    });
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    if(aggiornata)scritta('Aggiornata a '+aggiornata,W/2,Math.min(top+classifica.length*h+60,1665),'600 {} '+TESTO,38,GRIGIO,940,1);
+  }
+
   function disegna(){
+    if(scelta.value==='classifica'){
+      storiaClassifica();
+      nomeFile='horto-muso-classifica.png';
+      var n=classifica.filter(function(s){return s.noi})[0];
+      tela.setAttribute('aria-label','Storia della classifica del girone B'+(n?': Horto Muso '+n.pos+'° con '+n.pt+' punti':''));
+      prepara();return;
+    }
     var p=partite[+scelta.value];
     if(!p)return;
     var giocata=p.gf!=null;
@@ -142,6 +187,9 @@
     tela.setAttribute('aria-label',giocata
       ?'Storia del risultato: '+p.casa+' '+p.punteggio+' '+p.ospiti+(p.marcatori?'. Gol: '+p.marcatori:'')
       :'Storia del matchday: '+p.casa+' contro '+p.ospiti+', '+giorno.format(p.inizio)+' alle '+ora.format(p.inizio)+', campo Mazzola di Beinasco');
+    prepara();
+  }
+  function prepara(){
     // l'immagine è pronta prima del tocco su Condividi (Safari vuole la condivisione subito dopo il tocco)
     immagine=null;
     tela.toBlob(function(b){
@@ -176,12 +224,18 @@
 
   fetch('index.html',{cache:'no-cache'}).then(function(r){return r.text()}).then(function(html){
     partite=leggi(html);
+    classifica=leggiClassifica(html);
     partite.forEach(function(p,i){
       var o=document.createElement('option');
       o.value=i;
       o.textContent=breve.format(p.inizio)+' · '+(p.gf!=null?p.casa+' '+p.punteggio+' '+p.ospiti:p.casa+' – '+p.ospiti+' (matchday)');
       scelta.appendChild(o);
     });
+    if(classifica.length){
+      var c=document.createElement('option');
+      c.value='classifica';c.textContent='Classifica girone B'+(aggiornata?' · '+aggiornata:'');
+      scelta.appendChild(c);
+    }
     scelta.value=predefinita();
     return Promise.all([fonts,stemmaPronto]);
   }).then(disegna).catch(function(){

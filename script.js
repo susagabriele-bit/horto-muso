@@ -77,6 +77,16 @@
   if(nota&&g)nota.textContent=v+(v===1?' vinta':' vinte')+' · '+n+' pari · '+p+(p===1?' persa':' perse');
 })();
 
+// CLASSIFICA: il riquadro del menu dice a che posto siamo
+(function(){
+  var noi=document.querySelector('.classifica .noi');
+  if(!noi)return;
+  var pos=noi.cells[0].textContent.trim(),pt=noi.querySelector('.pt').textContent.trim();
+  var d=document.querySelector('[data-posizione]'),g=document.querySelector('[data-posizione-grande]');
+  if(d)d.textContent=pos+'° posto nel girone B · '+pt+(pt==='1'?' punto':' punti');
+  if(g)g.textContent=pos+'°';
+})();
+
 // COMPARSE: maglie, partite e foto entrano in scena quando arrivano sullo schermo
 (function(){
   if(!('IntersectionObserver' in window))return;
@@ -113,7 +123,7 @@
       if(v.isIntersecting){v.target.classList.add('visto');oss.unobserve(v.target)}
     });
   },{rootMargin:'0px 0px -12% 0px',threshold:.12});
-  document.querySelectorAll('main h2, main .lead, .riquadri li, .kit figure, .kit p, .giocatore, .bilancio, .match').forEach(function(el){
+  document.querySelectorAll('main h2, main .lead, .riquadri li, .tabella-scorre, .kit figure, .kit p, .giocatore, .bilancio, .match').forEach(function(el){
     el.classList.add('reveal');oss.observe(el);
   });
   foto.forEach(function(f){oss.observe(f)});
@@ -200,7 +210,7 @@
   var osservaSezioni=new IntersectionObserver(function(voci){
     voci.forEach(function(v){attive[v.target.id]=v.isIntersecting});
     var scelta=null;
-    ['partite','rosa','foto'].forEach(function(id){if(attive[id]&&!scelta)scelta=id});
+    ['partite','classifica','rosa','foto'].forEach(function(id){if(attive[id]&&!scelta)scelta=id});
     Object.keys(link).forEach(function(id){link[id].setAttribute('aria-current',id===scelta?'true':'false')});
   },{rootMargin:'-45% 0px -50% 0px'});
   Object.keys(link).forEach(function(id){var s=document.getElementById(id);if(s)osservaSezioni.observe(s)});

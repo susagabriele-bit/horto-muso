@@ -76,6 +76,7 @@
 <nav class="barra" aria-label="Sezioni del sito">
   <a class="barra-logo" href="#top" aria-label="Torna all’inizio"><picture><source srcset="assets/logo-192.webp" type="image/webp"><img src="assets/logo-192.png" width="36" height="36" alt=""></picture></a>
   <a href="#partite">Partite</a>
+  <a href="#classifica">Classifica</a>
   <a href="#rosa">Rosa</a>
   <a href="#foto">Foto</a>
 </nav>
@@ -89,6 +90,14 @@
         <span class="r-titolo">Partite</span>
         <span class="r-dato" data-prossima>Calendario e risultati</span>
         <span class="r-nota" data-bilancio></span>
+        <span class="r-vai" aria-hidden="true">→</span>
+      </a>
+    </li>
+    <li>
+      <a class="riquadro r-classifica" href="#classifica">
+        <span class="r-numero" aria-hidden="true" data-posizione-grande></span>
+        <span class="r-titolo">Classifica</span>
+        <span class="r-dato" data-posizione>Girone B</span>
         <span class="r-vai" aria-hidden="true">→</span>
       </a>
     </li>
@@ -146,6 +155,31 @@
       <span class="stato"></span>
     </li>
   </ol>
+</section>
+
+<section id="classifica">
+  <h2>Classifica</h2>
+  <p class="lead">Girone B, regular season. <span class="aggiornata">Aggiornata a <time datetime="2026-11-08">domenica 8 novembre</time></span>, dal sito del torneo.</p>
+  <div class="tabella-scorre">
+  <table class="classifica">
+    <caption class="sr">Classifica del girone B della Mazzola Cup</caption>
+    <thead>
+      <tr><th scope="col"><abbr title="Posizione">#</abbr></th><th scope="col">Squadra</th><th scope="col" class="pt"><abbr title="Punti">Pt</abbr></th><th scope="col"><abbr title="Giocate">G</abbr></th><th scope="col"><abbr title="Vinte">V</abbr></th><th scope="col"><abbr title="Pareggiate">N</abbr></th><th scope="col"><abbr title="Perse">P</abbr></th><th scope="col" class="col-gol"><abbr title="Gol fatti">GF</abbr></th><th scope="col" class="col-gol"><abbr title="Gol subiti">GS</abbr></th><th scope="col"><abbr title="Differenza reti">DR</abbr></th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><th scope="row">CSKA la rissa</th><td class="pt">12</td><td>4</td><td>4</td><td>0</td><td>0</td><td class="col-gol">26</td><td class="col-gol">10</td><td>+16</td></tr>
+      <tr><td>2</td><th scope="row">Fuman Team</th><td class="pt">10</td><td>4</td><td>3</td><td>1</td><td>0</td><td class="col-gol">17</td><td class="col-gol">5</td><td>+12</td></tr>
+      <tr><td>3</td><th scope="row">I Ragazzi Di Piazza</th><td class="pt">10</td><td>4</td><td>3</td><td>1</td><td>0</td><td class="col-gol">29</td><td class="col-gol">19</td><td>+10</td></tr>
+      <tr><td>4</td><th scope="row">Los Nigros</th><td class="pt">7</td><td>4</td><td>2</td><td>1</td><td>1</td><td class="col-gol">18</td><td class="col-gol">15</td><td>+3</td></tr>
+      <tr><td>5</td><th scope="row">Cimi FC</th><td class="pt">7</td><td>4</td><td>2</td><td>1</td><td>1</td><td class="col-gol">17</td><td class="col-gol">15</td><td>+2</td></tr>
+      <tr class="noi"><td>6</td><th scope="row">Horto Muso</th><td class="pt">6</td><td>4</td><td>2</td><td>0</td><td>2</td><td class="col-gol">24</td><td class="col-gol">25</td><td>−1</td></tr>
+      <tr><td>7</td><th scope="row">Fireball</th><td class="pt">3</td><td>4</td><td>1</td><td>0</td><td>3</td><td class="col-gol">19</td><td class="col-gol">24</td><td>−5</td></tr>
+      <tr><td>8</td><th scope="row">Longobarda</th><td class="pt">3</td><td>4</td><td>1</td><td>0</td><td>3</td><td class="col-gol">13</td><td class="col-gol">24</td><td>−11</td></tr>
+      <tr><td>9</td><th scope="row">Porcheria FC</th><td class="pt">0</td><td>4</td><td>0</td><td>0</td><td>4</td><td class="col-gol">19</td><td class="col-gol">29</td><td>−10</td></tr>
+      <tr><td>10</td><th scope="row">Pitone FC</th><td class="pt">0</td><td>4</td><td>0</td><td>0</td><td>4</td><td class="col-gol">14</td><td class="col-gol">30</td><td>−16</td></tr>
+    </tbody>
+  </table>
+  </div>
 </section>
 
 <section id="rosa">
