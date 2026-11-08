@@ -74,3 +74,10 @@ for name, box in RITAGLI.items():
     r.save(out / f"{name}.jpg", quality=84, optimize=True, progressive=True)
     r.save(out / f"{name}.webp", quality=82, method=6)
     print(name, r.size)
+
+# --- Icona per la schermata Home dell'iPhone: quadrata, sfondo pieno, gli angoli li arrotonda iOS ---
+icona = src / "icona.png"
+if icona.exists():
+    ic = Image.open(icona).convert("RGB")
+    ic.resize((180, 180), Image.LANCZOS).save(out / "apple-touch-icon.png", optimize=True)
+    print("icona", ic.size)
