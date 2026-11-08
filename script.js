@@ -215,3 +215,18 @@
   },{rootMargin:'-45% 0px -50% 0px'});
   Object.keys(link).forEach(function(id){var s=document.getElementById(id);if(s)osservaSezioni.observe(s)});
 })();
+
+// ARRIVO DA UN LINK CON #sezione (es. "Torna al sito" dalle storie): salta lì subito, senza ripassare dal cavallo
+(function(){
+  var id=decodeURIComponent(location.hash.slice(1));
+  var meta=id&&document.getElementById(id);
+  if(!meta||meta.id==='top')return;
+  if('scrollRestoration' in history)history.scrollRestoration='manual';
+  function vai(){meta.scrollIntoView({behavior:'instant',block:'start'})}
+  vai();
+  // dopo che foto e font hanno finito di caricare la pagina può essersi allungata: riallinea,
+  // ma solo se nel frattempo non hai già iniziato a scorrere tu
+  var mosso=false;
+  ['wheel','touchstart','keydown'].forEach(function(t){addEventListener(t,function(){mosso=true},{once:true,passive:true})});
+  addEventListener('load',function(){if(!mosso)vai()});
+})();

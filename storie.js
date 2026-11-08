@@ -7,6 +7,11 @@
   var TESTO='Barlow,system-ui,sans-serif';
   var NOI='Horto Muso';
 
+  // TORNA AL SITO: riporta alla sezione da cui sei arrivato, non al cavallo
+  var torna=document.getElementById('torna');
+  var da=(location.search.match(/[?&]da=(partite|classifica)\b/)||[])[1];
+  if(torna&&da)torna.href='./#'+da;
+
   var tela=document.getElementById('tela'),ctx=tela.getContext('2d');
   var scelta=document.getElementById('partita');
   var bottoneCondividi=document.getElementById('condividi');

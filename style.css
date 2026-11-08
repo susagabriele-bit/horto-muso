@@ -72,6 +72,7 @@ padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;dis
 
 /* PULSANTI: stesso stile dei riquadri del menu, in piccolo */
 .pulsanti{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:clamp(.7rem,2.5vw,1.2rem);margin-top:2rem}
+.pulsanti-su{margin:0 0 2.5rem}
 .pulsante{position:relative;display:flex;flex-direction:column;justify-content:center;gap:.15rem;min-height:5.5rem;padding:1rem 4rem 1rem 1.2rem;
 color:var(--bianco);text-decoration:none;background:repeating-linear-gradient(90deg,transparent 0 22px,rgb(2 137 71/.14) 22px 44px),var(--carta);
 border:2px solid var(--verde);border-radius:6px 6px 22px 22px;transition:border-color .2s,translate .2s}
