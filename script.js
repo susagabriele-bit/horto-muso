@@ -40,6 +40,11 @@
   var righe=document.querySelectorAll('.match[data-inizio]');
   var ora=new Date(),prossimaTrovata=false;
   var g=0,v=0,n=0,p=0,gf=0,gs=0;
+  // il riquadro "Partite" del menu mostra subito la prossima partita
+  function segnaRiquadro(r,quando){
+    var d=document.querySelector('[data-prossima]');
+    if(d)d.textContent=quando+': '+r.querySelector('b').textContent.trim()+', '+r.querySelector('time').textContent.trim();
+  }
   righe.forEach(function(r){
     var stato=r.querySelector('.stato');
     if(r.dataset.gf!=null){
@@ -57,10 +62,10 @@
     }else if(inizio.toDateString()===ora.toDateString()){
       stato.classList.add('oggi');
       stato.textContent=inizio.getHours()>=18?'Stasera':'Oggi';
-      prossimaTrovata=true;
+      prossimaTrovata=true;segnaRiquadro(r,stato.textContent);
     }else if(!prossimaTrovata){
       stato.textContent='Prossima';
-      prossimaTrovata=true;
+      prossimaTrovata=true;segnaRiquadro(r,'Prossima');
     }
   });
   var b=document.querySelector('.bilancio');
@@ -68,6 +73,8 @@
     b.textContent='Giocate '+g+' · vinte '+v+' · pari '+n+' · perse '+p+' · gol fatti '+gf+', subiti '+gs;
     b.hidden=false;
   }
+  var nota=document.querySelector('[data-bilancio]');
+  if(nota&&g)nota.textContent=v+(v===1?' vinta':' vinte')+' · '+n+' pari · '+p+(p===1?' persa':' perse');
 })();
 
 // COMPARSE: maglie, partite e foto entrano in scena quando arrivano sullo schermo
@@ -91,6 +98,7 @@
     c.style.setProperty('--ritardo',col*90+'ms');
   });
   document.querySelectorAll('.match').forEach(function(m,i){m.style.setProperty('--ritardo',i*70+'ms')});
+  document.querySelectorAll('.riquadri li').forEach(function(m,i){m.style.setProperty('--ritardo',i*90+'ms')});
 
   var foto=document.querySelectorAll('.carosello-finestra');
   foto.forEach(function(f){
@@ -105,7 +113,7 @@
       if(v.isIntersecting){v.target.classList.add('visto');oss.unobserve(v.target)}
     });
   },{rootMargin:'0px 0px -12% 0px',threshold:.12});
-  document.querySelectorAll('main h2, main .lead, .kit figure, .kit p, .giocatore, .bilancio, .match').forEach(function(el){
+  document.querySelectorAll('main h2, main .lead, .riquadri li, .kit figure, .kit p, .giocatore, .bilancio, .match').forEach(function(el){
     el.classList.add('reveal');oss.observe(el);
   });
   foto.forEach(function(f){oss.observe(f)});
@@ -171,4 +179,29 @@
 
   [prec,succ,car.querySelector('.carosello-comandi')].forEach(function(el){el.hidden=false});
   etichetta();segna();avvia();
+})();
+
+// BARRA: nascosta durante l'intro, poi segna la sezione in cui ti trovi
+(function(){
+  var barra=document.querySelector('.barra'),hero=document.querySelector('.hero');
+  if(!barra||!hero||!('IntersectionObserver' in window))return;
+  barra.classList.add('nascosta');
+  // la spia copre l'intro: finché se ne vede un pezzo la barra resta nascosta
+  var spia=document.createElement('div');
+  spia.setAttribute('aria-hidden','true');
+  spia.style.cssText='position:absolute;left:0;width:1px;top:0;bottom:calc(100svh - 1px);pointer-events:none';
+  hero.style.position='relative';hero.appendChild(spia);
+  new IntersectionObserver(function(v){
+    barra.classList.toggle('nascosta',v[0].isIntersecting);
+  }).observe(spia);
+  var link={};
+  barra.querySelectorAll('a[href^="#"]:not(.barra-logo)').forEach(function(a){link[a.hash.slice(1)]=a});
+  var attive={};
+  var osservaSezioni=new IntersectionObserver(function(voci){
+    voci.forEach(function(v){attive[v.target.id]=v.isIntersecting});
+    var scelta=null;
+    ['partite','rosa','foto'].forEach(function(id){if(attive[id]&&!scelta)scelta=id});
+    Object.keys(link).forEach(function(id){link[id].setAttribute('aria-current',id===scelta?'true':'false')});
+  },{rootMargin:'-45% 0px -50% 0px'});
+  Object.keys(link).forEach(function(id){var s=document.getElementById(id);if(s)osservaSezioni.observe(s)});
 })();

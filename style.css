@@ -1,6 +1,7 @@
 :root{--nero:#000;--verde:#028947;--maglia:#127a3e;--erba:#1fcf6a;--bianco:#f7f5ef;--grigio:#a9b3ad;--carta:#0d1511;--todo:#ffd400;color-scheme:dark;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--nero)}
+html{scroll-padding-top:calc(3.6rem + env(safe-area-inset-top,0px));background:var(--nero)}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--nero);color:var(--bianco);font:400 1.05rem/1.55 Barlow,system-ui,sans-serif}
 h1,h2,h3,.num{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:900;margin:0;line-height:.95}
@@ -92,6 +93,41 @@ background:rgb(0 0 0/.6);color:var(--bianco);cursor:pointer;display:grid;place-i
 .car-pausa{font:600 .85rem Barlow,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--grigio);background:none;border:1px solid currentColor;border-radius:4px;padding:.35rem .7rem;min-height:1.75rem;cursor:pointer}
 .car-pausa:hover{color:var(--bianco)}
 
+/* BARRA in alto: compare finita l'intro, porta alle sezioni */
+.barra{position:fixed;z-index:20;top:0;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:clamp(.2rem,2vw,1.2rem);
+padding:calc(.35rem + env(safe-area-inset-top,0px)) max(.6rem,env(safe-area-inset-right,0px)) .35rem max(.6rem,env(safe-area-inset-left,0px));
+background:rgb(0 0 0/.88);border-bottom:2px solid var(--verde);transition:translate .3s ease,visibility .3s}
+@supports(backdrop-filter:blur(1px)){.barra{background:rgb(0 0 0/.7);backdrop-filter:blur(10px)}}
+.barra.nascosta{translate:0 -110%;visibility:hidden}
+.barra a{color:var(--bianco);text-decoration:none;font:700 1.25rem/1 "Big Shoulders Display",Impact,sans-serif;letter-spacing:.06em;text-transform:uppercase;
+padding:.55rem .7rem;border-radius:4px;border-bottom:3px solid transparent}
+.barra a:hover{color:var(--erba)}
+.barra a[aria-current="true"]{color:var(--erba);border-bottom-color:var(--erba)}
+.barra .barra-logo{padding:0 .3rem 0 0;margin-right:auto;border:0;line-height:0}
+.barra-logo img{width:36px;height:36px}
+@media(min-width:700px){.barra .barra-logo{margin-right:0;position:absolute;left:max(1rem,env(safe-area-inset-left,0px))}}
+
+/* MENU a riquadri subito dopo l'intro */
+#menu{padding-top:clamp(2.5rem,6vw,4.5rem);padding-bottom:0}
+.riquadri{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:clamp(.7rem,2.5vw,1.2rem)}
+.riquadro{position:relative;overflow:hidden;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;gap:.2rem;
+min-height:clamp(8.5rem,24vw,13rem);height:100%;padding:1.1rem 3.2rem 1.1rem 1.2rem;color:var(--bianco);text-decoration:none;
+background:var(--carta);border:2px solid var(--verde);border-radius:6px 6px 22px 22px;transition:border-color .2s,translate .2s}
+.riquadro:hover{border-color:var(--erba);translate:0 -3px}
+.r-titolo{font:900 clamp(2.3rem,7vw,3.2rem)/.95 "Big Shoulders Display",Impact,sans-serif;letter-spacing:.01em}
+.r-dato{font-weight:600}
+.r-nota{color:var(--erba);font-weight:600;font-size:.9rem}
+.r-nota:empty{display:none}
+.r-vai{position:absolute;right:1rem;bottom:.9rem;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--verde);display:grid;place-items:center;font-weight:700;transition:background .2s}
+.riquadro:hover .r-vai{background:var(--erba);color:var(--nero)}
+.r-partite{background:repeating-linear-gradient(90deg,transparent 0 22px,rgb(2 137 71/.14) 22px 44px),var(--carta)}
+.r-maglia{position:absolute;z-index:-1;right:-.6rem;top:-.6rem;width:clamp(5.5rem,22vw,8rem);height:auto;rotate:12deg;opacity:.85}
+.r-sfondo{position:absolute;z-index:-1;inset:0}
+.r-sfondo img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.r-foto::before{content:"";position:absolute;z-index:0;inset:0;background:linear-gradient(to top,rgb(0 0 0/.88) 15%,rgb(0 0 0/.25) 75%);pointer-events:none}
+.r-foto>span{position:relative;z-index:1}
+.r-foto .r-vai{position:absolute}
+
 footer{padding:3rem 1.2rem 4rem;text-align:center;background:var(--verde);color:var(--nero);font-weight:600}
 footer img{width:84px;height:84px;display:block;margin:0 auto 1rem}
 
@@ -103,6 +139,7 @@ main{overflow-x:clip}
 .anim .kit figure.reveal{transform:translateX(-60px) rotate(-6deg)}
 .anim .kit p.reveal,.anim .lead.reveal,.anim .bilancio.reveal{transform:translateY(24px)}
 .anim .match.reveal{transform:translateX(-48px)}
+.anim .riquadri li.reveal{transform:translateY(36px)}
 .anim .reveal.visto{opacity:1;transform:none}
 /* sotto i titoli una fascia a strisce verdi che si allunga, come lo scudo */
 h2::after{content:"";display:block;height:.14em;width:min(100%,5em);margin-top:.18em;
@@ -116,5 +153,5 @@ background:repeating-linear-gradient(90deg,var(--verde) 0 .45em,transparent .45e
 .tende i:nth-child(even){background:var(--verde);transform-origin:bottom}
 .visto > .tende i{transform:scaleY(0)}
 
-@media(prefers-reduced-motion:reduce){.hero{--p:1;height:100svh}.scrollhint{display:none}
+@media(prefers-reduced-motion:reduce){.hero{--p:1;height:100svh}.scrollhint{display:none}.barra,.riquadro,.r-vai{transition:none}.riquadro:hover{translate:none}
 .anim .reveal{opacity:1;transform:none;transition:none}.anim .tende{display:none}h2::after{transition:none;transform:none!important}}
