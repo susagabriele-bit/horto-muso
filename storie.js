@@ -13,6 +13,7 @@
   var linkScarica=document.getElementById('scarica');
   var stato=document.getElementById('stato');
   var logo=new Image();logo.src='assets/logo.png';
+  var torneo=new Image();torneo.src='assets/mazzola.png';
   var partite=[],classifica=[],aggiornata='',immagine=null,urlImmagine=null,nomeFile='horto-muso-storia.png';
 
   var giorno=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Rome'});
@@ -59,6 +60,7 @@
 
   // partita proposta all'apertura: quella di oggi, se no il risultato degli ultimi due giorni, se no la prossima
   function predefinita(){
+    if(/[?&]storia=classifica\b/.test(location.search)&&classifica.length)return 'classifica';
     var adesso=new Date(),oggi=adesso.toDateString();
     for(var i=0;i<partite.length;i++)if(partite[i].inizio.toDateString()===oggi)return i;
     var ultimaGiocata=-1;
@@ -100,6 +102,17 @@
       ctx.drawImage(logo,cx-lato/2,y,lato,lato);ctx.restore();
     }
   }
+  // riga in alto: stemma della Mazzola Cup e scritta, centrati insieme
+  function intestazione(testo){
+    var lato=80,spazio=20;
+    spaziatura(8);ctx.font='600 40px '+TESTO;
+    var tw=Math.min(ctx.measureText(testo).width,940-lato-spazio);
+    var x=(W-(lato+spazio+tw))/2;
+    if(torneo.complete&&torneo.naturalWidth)ctx.drawImage(torneo,x,282-lato/2,lato,lato);else{x-=(lato+spazio)/2}
+    ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle=BIANCO;
+    ctx.fillText(testo,x+lato+spazio,288,940-lato-spazio);
+    spaziatura(0);ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  }
   function nomeSquadra(nome,y,dim){
     var nostra=nome.toLowerCase()===NOI.toLowerCase();
     scritta(nome.toUpperCase(),W/2,y,'900 {} '+TITOLO,dim,nostra?ERBA:BIANCO,940,2);
@@ -108,7 +121,7 @@
   function matchday(p){
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    scritta('MAZZOLA CUP · GIRONE B',W/2,300,'600 {} '+TESTO,40,BIANCO,940,8);
+    intestazione('MAZZOLA CUP · GIRONE B');
     scritta('MATCHDAY',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
     stemma(W/2,510,440);
     nomeSquadra(p.casa,1080,130);
@@ -127,7 +140,7 @@
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
     var esito=p.gf>p.gs?'VITTORIA':p.gf<p.gs?'SCONFITTA':'PAREGGIO';
-    scritta('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase(),W/2,300,'600 {} '+TESTO,40,BIANCO,940,8);
+    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase());
     scritta(esito,W/2,470,'900 {} '+TITOLO,190,p.gf>p.gs?ERBA:BIANCO,980,6);
     stemma(W/2,510,340);
     nomeSquadra(p.casa,990,110);
@@ -146,7 +159,7 @@
   function storiaClassifica(){
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    scritta('MAZZOLA CUP · GIRONE B',W/2,300,'600 {} '+TESTO,40,BIANCO,940,8);
+    intestazione('MAZZOLA CUP · GIRONE B');
     scritta('CLASSIFICA',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
     var x0=70,x1=W-70,top=540,h=Math.min(100,1060/Math.max(classifica.length,1));
     ctx.textBaseline='middle';
@@ -220,7 +233,7 @@
     document.fonts.load('700 100px "Big Shoulders Display"'),
     document.fonts.load('600 40px Barlow')
   ]).catch(function(){}):Promise.resolve();
-  var stemmaPronto=logo.decode?logo.decode().catch(function(){}):Promise.resolve();
+  var stemmaPronto=Promise.all([logo,torneo].map(function(i){return i.decode?i.decode().catch(function(){}):null}));
 
   fetch('index.html',{cache:'no-cache'}).then(function(r){return r.text()}).then(function(html){
     partite=leggi(html);

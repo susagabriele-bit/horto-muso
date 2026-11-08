@@ -70,6 +70,14 @@ padding:clamp(.6rem,3vw,1rem) clamp(.5rem,3vw,1rem) 1.2rem;text-align:center;dis
 .bilancio{margin:-2rem 0 2rem;font-weight:600;color:var(--erba)}
 @media(max-width:560px){.match{grid-template-columns:1fr auto}.match b{grid-column:1/-1;grid-row:2}.marcatori{grid-column:1/-1}}
 
+.con-stemma{display:flex;align-items:center;flex-wrap:wrap;gap:.25em}
+.con-stemma::after{flex-basis:100%;max-width:5em}
+.stemma-torneo{width:.85em;height:.85em;display:block}
+.lead a{color:var(--bianco)}
+.link-storie{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.5rem;padding:.7rem 1rem;border:2px solid var(--verde);border-radius:6px;
+color:var(--bianco);text-decoration:none;font:700 1.15rem/1 "Big Shoulders Display",Impact,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.link-storie:hover{border-color:var(--erba);color:var(--erba)}
+
 /* CLASSIFICA */
 .aggiornata{white-space:nowrap}
 .tabella-scorre{overflow-x:auto;border-top:2px solid var(--verde);border-bottom:2px solid var(--verde)}
@@ -147,6 +155,8 @@ background:var(--carta);border:2px solid var(--verde);border-radius:6px 6px 22px
 .r-foto .r-vai{position:absolute}
 
 footer{padding:3rem 1.2rem 4rem;text-align:center;background:var(--verde);color:var(--nero);font-weight:600}
+.piede-link{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.5rem;margin-top:1rem}
+.piede-link a{color:var(--nero)}
 footer img{width:84px;height:84px;display:block;margin:0 auto 1rem}
 
 

@@ -81,3 +81,22 @@ if icona.exists():
     ic = Image.open(icona).convert("RGB")
     ic.resize((180, 180), Image.LANCZOS).save(out / "apple-touch-icon.png", optimize=True)
     print("icona", ic.size)
+
+# --- Logo della Mazzola Cup (da Instagram): tengo solo il cerchio bianco, fuori trasparente ---
+mazzola = src / "mazzola.png"
+if mazzola.exists():
+    m = Image.open(mazzola).convert("RGB")
+    chiaro = np.asarray(m.convert("L")) > 128
+    ys, xs = np.nonzero(chiaro)
+    cx, cy = (xs.min() + xs.max()) / 2, (ys.min() + ys.max()) / 2
+    raggio = min(xs.max() - xs.min(), ys.max() - ys.min()) / 2 - 1
+    lato = int(raggio * 2)
+    sx = 4  # maschera disegnata più grande e poi ridotta: bordo del cerchio pulito
+    gy, gx = np.mgrid[0:lato * sx, 0:lato * sx]
+    dentro = ((gx + .5) / sx - raggio) ** 2 + ((gy + .5) / sx - raggio) ** 2 <= raggio ** 2
+    alpha = Image.fromarray((dentro * 255).astype(np.uint8)).resize((lato, lato), Image.LANCZOS)
+    tondo = m.crop((round(cx - raggio), round(cy - raggio), round(cx - raggio) + lato, round(cy - raggio) + lato))
+    tondo.putalpha(alpha)
+    tondo.save(out / "mazzola.png", optimize=True)
+    tondo.save(out / "mazzola.webp", quality=90, method=6)
+    print("mazzola", tondo.size)
