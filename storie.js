@@ -115,6 +115,18 @@
     g.addColorStop(.66,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,.97)');
     ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   }
+  // grana di stampa sopra tutta la storia: scritte e disegno sembrano usciti dalla stessa serigrafia
+  var trama=null;
+  function grana(){
+    if(!trama){
+      var t=document.createElement('canvas');t.width=t.height=256;
+      var c=t.getContext('2d'),d=c.createImageData(256,256);
+      for(var i=0;i<d.data.length;i+=4){var v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}
+      c.putImageData(d,0,0);trama=ctx.createPattern(t,'repeat');
+    }
+    ctx.save();ctx.globalCompositeOperation='overlay';ctx.globalAlpha=.16;
+    ctx.fillStyle=trama;ctx.fillRect(0,0,W,H);ctx.restore();
+  }
   // titolone sopra la scena: un'ombra lo stacca dai punti chiari dell'illustrazione
   function titoloSuScena(testo,y){
     ctx.save();ctx.shadowColor='rgba(0,0,0,.75)';ctx.shadowBlur=30;
@@ -187,6 +199,7 @@
     fascia(1536);
     scritta(giorno.format(p.inizio).toUpperCase(),W/2,1622,'700 {} '+TITOLO,68,BIANCO,960,3);
     scritta('ORE '+ora.format(p.inizio)+' · BEINASCO',W/2,1694,'900 {} '+TITOLO,60,ERBA,960,3);
+    grana();
   }
 
   function esitoDi(p){return p.gf>p.gs?'VITTORIA':p.gf<p.gs?'SCONFITTA':'PAREGGIO'}
@@ -206,6 +219,7 @@
       ctx.fillStyle=BIANCO;
       righe.forEach(function(r,k){ctx.fillText(r,W/2,1645+k*(dim+12))});
     }
+    grana();
   }
 
   function fotofinish(p,img){

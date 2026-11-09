@@ -101,12 +101,18 @@ if mazzola.exists():
     tondo.save(out / "mazzola.webp", quality=90, method=6)
     print("mazzola", tondo.size)
 
-# --- Scene delle storie (Gran Premio / Fotofinish): verticali 1080x1920, ritagliate al centro se il formato è diverso ---
+# --- Scene delle storie (Gran Premio / Fotofinish): verticali 1080x1920 ---
+# Le scene di ChatGPT sono 2:3: le porto alla larghezza piena senza tagliare i lati, con la riga al 25%
+# dell'altezza allineata al 25% della storia (dove il prompt fa iniziare il soggetto), e riempio sopra e sotto
+# col colore del fondo della scena.
 for sorgente in sorted((src / "scene").glob("*.png")) if (src / "scene").exists() else []:
     sc = Image.open(sorgente).convert("RGB")
-    k = max(1080 / sc.width, 1920 / sc.height)
-    sc = sc.resize((round(sc.width * k), round(sc.height * k)), Image.LANCZOS)
-    x, y = (sc.width - 1080) // 2, (sc.height - 1920) // 2
+    k = 1080 / sc.width
+    sc = sc.resize((1080, round(sc.height * k)), Image.LANCZOS)
+    a = np.asarray(sc)
+    fondo = tuple(int(v) for v in np.median(np.concatenate([a[:8].reshape(-1, 3), a[-8:].reshape(-1, 3)]), axis=0))
+    tela = Image.new("RGB", (1080, 1920), fondo)
+    tela.paste(sc, (0, round(1920 * .25 - sc.height * .25)))
     (out / "scene").mkdir(exist_ok=True)
-    sc.crop((x, y, x + 1080, y + 1920)).save(out / "scene" / f"{sorgente.stem}.webp", quality=84, method=6)
-    print("scena", sorgente.stem, sc.size)
+    tela.save(out / "scene" / f"{sorgente.stem}.webp", quality=86, method=6)
+    print("scena", sorgente.stem, sc.size, "fondo", fondo)
