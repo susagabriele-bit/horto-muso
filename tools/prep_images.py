@@ -100,3 +100,13 @@ if mazzola.exists():
     tondo.save(out / "mazzola.png", optimize=True)
     tondo.save(out / "mazzola.webp", quality=90, method=6)
     print("mazzola", tondo.size)
+
+# --- Scene delle storie (Gran Premio / Fotofinish): verticali 1080x1920, ritagliate al centro se il formato è diverso ---
+for sorgente in sorted((src / "scene").glob("*.png")) if (src / "scene").exists() else []:
+    sc = Image.open(sorgente).convert("RGB")
+    k = max(1080 / sc.width, 1920 / sc.height)
+    sc = sc.resize((round(sc.width * k), round(sc.height * k)), Image.LANCZOS)
+    x, y = (sc.width - 1080) // 2, (sc.height - 1920) // 2
+    (out / "scene").mkdir(exist_ok=True)
+    sc.crop((x, y, x + 1080, y + 1920)).save(out / "scene" / f"{sorgente.stem}.webp", quality=84, method=6)
+    print("scena", sorgente.stem, sc.size)

@@ -1,5 +1,7 @@
 // STORIE INSTAGRAM: legge il calendario da index.html e disegna la storia (1080×1920) su un canvas.
-// Prima della partita: matchday. A partita giocata (data-gf/data-gs presenti): risultato e marcatori.
+// Prima della partita: Gran Premio. A partita giocata (data-gf/data-gs presenti): Fotofinish con risultato e marcatori.
+// Se la riga del calendario ha data-scena (e per il Fotofinish data-scena-fotofinish) l'illustrazione fa da sfondo,
+// altrimenti restano le strisce dello scudo.
 (function(){
   var W=1080,H=1920;
   var VERDE='#028947',ERBA='#1fcf6a',BIANCO='#f7f5ef',GRIGIO='#a9b3ad';
@@ -47,7 +49,9 @@
         casa:casa,ospiti:ospiti,punteggio:punteggio,
         gf:r.dataset.gf!=null?+r.dataset.gf:null,
         gs:r.dataset.gs!=null?+r.dataset.gs:null,
-        marcatori:m?m.textContent.replace(/^\s*Gol:\s*/i,'').trim():''
+        marcatori:m?m.textContent.replace(/^\s*Gol:\s*/i,'').trim():'',
+        scena:r.dataset.scena||'',
+        scenaFotofinish:r.dataset.scenaFotofinish||r.dataset.scena||''
       };
     });
   }
@@ -101,6 +105,36 @@
     g.addColorStop(0,'rgba(0,0,0,.25)');g.addColorStop(.42,'rgba(0,0,0,.72)');g.addColorStop(.6,'rgba(0,0,0,.92)');g.addColorStop(1,'rgba(0,0,0,.96)');
     ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   }
+  // la scena riempie tutta la storia (tagliando i lati se serve) e sfuma nel nero in alto e in basso, dove vanno le scritte
+  function sfondoScena(img){
+    ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+    var k=Math.max(W/img.naturalWidth,H/img.naturalHeight),w=img.naturalWidth*k,h=img.naturalHeight*k;
+    ctx.drawImage(img,(W-w)/2,(H-h)/2,w,h);
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'rgba(0,0,0,.85)');g.addColorStop(.3,'rgba(0,0,0,0)');g.addColorStop(.52,'rgba(0,0,0,0)');
+    g.addColorStop(.66,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,.97)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  // titolone sopra la scena: un'ombra lo stacca dai punti chiari dell'illustrazione
+  function titoloSuScena(testo,y){
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.75)';ctx.shadowBlur=30;
+    scritta(testo,W/2,y,'900 {} '+TITOLO,180,BIANCO,980,6);
+    ctx.restore();
+  }
+  function fascia(y){
+    // fascia a strisce, come sotto i titoli del sito
+    for(var i=0;i<6;i++){ctx.fillStyle=VERDE;ctx.fillRect(W/2-275+i*100,y,50,12)}
+  }
+  var scene={};
+  function caricaScena(src){
+    if(!src)return Promise.resolve(null);
+    if(!scene[src])scene[src]=new Promise(function(ok){
+      var i=new Image();
+      i.onload=function(){ok(i)};i.onerror=function(){ok(null)};
+      i.src=src;
+    });
+    return scene[src];
+  }
   function stemma(cx,y,lato){
     if(logo.complete&&logo.naturalWidth){
       ctx.save();ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=40;
@@ -123,36 +157,70 @@
     scritta(nome.toUpperCase(),W/2,y,'900 {} '+TITOLO,dim,nostra?ERBA:BIANCO,940,2);
   }
 
-  function matchday(p){
+  function granPremio(p,img){
+    if(img){granPremioScena(p,img);return}
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
     intestazione('MAZZOLA CUP · GIRONE B');
-    scritta('MATCHDAY',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
+    scritta('GRAN PREMIO',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
     stemma(W/2,510,440);
     nomeSquadra(p.casa,1080,130);
     // VS nel cerchio verde
     ctx.fillStyle=VERDE;ctx.beginPath();ctx.arc(W/2,1160,62,0,Math.PI*2);ctx.fill();
     ctx.textBaseline='middle';scritta('VS',W/2,1166,'900 {} '+TITOLO,64,BIANCO);ctx.textBaseline='alphabetic';
     nomeSquadra(p.ospiti,1340,130);
-    // fascia a strisce, come sotto i titoli del sito
-    for(var i=0;i<6;i++){ctx.fillStyle=VERDE;ctx.fillRect(W/2-275+i*100,1400,50,12)}
+    fascia(1400);
     scritta(giorno.format(p.inizio).toUpperCase(),W/2,1510,'700 {} '+TITOLO,84,BIANCO,960,3);
     scritta('ORE '+ora.format(p.inizio),W/2,1600,'900 {} '+TITOLO,84,ERBA,960,3);
     scritta('Campo Mazzola · Beinasco',W/2,1665,'600 {} '+TESTO,40,GRIGIO,940,1);
   }
 
-  function risultato(p){
+  function granPremioScena(p,img){
+    sfondoScena(img);
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    intestazione('MAZZOLA CUP · GIRONE B');
+    titoloSuScena('GRAN PREMIO',460);
+    nomeSquadra(p.casa,1300,104);
+    ctx.fillStyle=VERDE;ctx.beginPath();ctx.arc(W/2,1362,46,0,Math.PI*2);ctx.fill();
+    ctx.textBaseline='middle';scritta('VS',W/2,1366,'900 {} '+TITOLO,48,BIANCO);ctx.textBaseline='alphabetic';
+    nomeSquadra(p.ospiti,1500,104);
+    fascia(1536);
+    scritta(giorno.format(p.inizio).toUpperCase(),W/2,1622,'700 {} '+TITOLO,68,BIANCO,960,3);
+    scritta('ORE '+ora.format(p.inizio)+' · BEINASCO',W/2,1694,'900 {} '+TITOLO,60,ERBA,960,3);
+  }
+
+  function esitoDi(p){return p.gf>p.gs?'VITTORIA':p.gf<p.gs?'SCONFITTA':'PAREGGIO'}
+
+  function fotofinishScena(p,img){
+    sfondoScena(img);
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase());
+    titoloSuScena('FOTOFINISH',460);
+    scritta(esitoDi(p),W/2,1220,'900 {} '+TITOLO,58,p.gf>p.gs?ERBA:GRIGIO,940,10);
+    nomeSquadra(p.casa,1305,84);
+    scritta((p.punteggio||'').replace(/\s*[–-]\s*/,' – '),W/2,1490,'900 {} '+TITOLO,200,BIANCO,960,4);
+    nomeSquadra(p.ospiti,1580,84);
+    if(p.marcatori){
+      var dim=40,righe;
+      do{ctx.font='600 '+dim+'px '+TESTO;righe=aCapo('Gol: '+p.marcatori.replace(/,\s*/g,' · '),920);dim-=2}while(righe.length>2&&dim>26);
+      ctx.fillStyle=BIANCO;
+      righe.forEach(function(r,k){ctx.fillText(r,W/2,1645+k*(dim+12))});
+    }
+  }
+
+  function fotofinish(p,img){
+    if(img){fotofinishScena(p,img);return}
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    var esito=p.gf>p.gs?'VITTORIA':p.gf<p.gs?'SCONFITTA':'PAREGGIO';
-    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase());
+    var esito=esitoDi(p);
+    intestazione('FOTOFINISH · '+breve.format(p.inizio).toUpperCase());
     scritta(esito,W/2,470,'900 {} '+TITOLO,190,p.gf>p.gs?ERBA:BIANCO,980,6);
     stemma(W/2,510,340);
     nomeSquadra(p.casa,990,110);
     scritta((p.punteggio||'').replace(/\s*[–-]\s*/,' – '),W/2,1250,'900 {} '+TITOLO,290,BIANCO,960,4);
     nomeSquadra(p.ospiti,1370,110);
     if(p.marcatori){
-      for(var i=0;i<6;i++){ctx.fillStyle=VERDE;ctx.fillRect(W/2-275+i*100,1420,50,12)}
+      fascia(1420);
       scritta('GOL',W/2,1505,'900 {} '+TITOLO,54,ERBA,940,6);
       var dim=46,righe;
       do{ctx.font='600 '+dim+'px '+TESTO;righe=aCapo(p.marcatori.replace(/,\s*/g,' · '),900);dim-=2}while(righe.length>3&&dim>28);
@@ -188,8 +256,10 @@
     if(aggiornata)scritta('Aggiornata a '+aggiornata,W/2,Math.min(top+classifica.length*h+60,1665),'600 {} '+TESTO,38,GRIGIO,940,1);
   }
 
+  var giri=0;
   function disegna(){
     if(scelta.value==='classifica'){
+      giri++;
       storiaClassifica();
       nomeFile='horto-muso-classifica.png';
       var n=classifica.filter(function(s){return s.noi})[0];
@@ -198,14 +268,18 @@
     }
     var p=partite[+scelta.value];
     if(!p)return;
-    var giocata=p.gf!=null;
-    if(giocata)risultato(p);else matchday(p);
-    var data=p.inizio.toISOString().slice(0,10);
-    nomeFile='horto-muso-'+(giocata?'risultato':'matchday')+'-'+data+'.png';
-    tela.setAttribute('aria-label',giocata
-      ?'Storia del risultato: '+p.casa+' '+p.punteggio+' '+p.ospiti+(p.marcatori?'. Gol: '+p.marcatori:'')
-      :'Storia del matchday: '+p.casa+' contro '+p.ospiti+', '+giorno.format(p.inizio)+' alle '+ora.format(p.inizio)+', campo Mazzola di Beinasco');
-    prepara();
+    var giocata=p.gf!=null,turno=++giri;
+    immagine=null;
+    caricaScena(giocata?p.scenaFotofinish:p.scena).then(function(img){
+      if(turno!==giri)return; // nel frattempo è stata scelta un'altra partita
+      if(giocata)fotofinish(p,img);else granPremio(p,img);
+      var data=p.inizio.toISOString().slice(0,10);
+      nomeFile='horto-muso-'+(giocata?'fotofinish':'gran-premio')+'-'+data+'.png';
+      tela.setAttribute('aria-label',giocata
+        ?'Storia del fotofinish: '+p.casa+' '+p.punteggio+' '+p.ospiti+(p.marcatori?'. Gol: '+p.marcatori:'')
+        :'Storia del Gran Premio: '+p.casa+' contro '+p.ospiti+', '+giorno.format(p.inizio)+' alle '+ora.format(p.inizio)+', campo Mazzola di Beinasco');
+      prepara();
+    });
   }
   function prepara(){
     // l'immagine è pronta prima del tocco su Condividi (Safari vuole la condivisione subito dopo il tocco)
@@ -246,7 +320,7 @@
     partite.forEach(function(p,i){
       var o=document.createElement('option');
       o.value=i;
-      o.textContent=breve.format(p.inizio)+' · '+(p.gf!=null?p.casa+' '+p.punteggio+' '+p.ospiti:p.casa+' – '+p.ospiti+' (matchday)');
+      o.textContent=breve.format(p.inizio)+' · '+(p.gf!=null?p.casa+' '+p.punteggio+' '+p.ospiti:p.casa+' – '+p.ospiti+' (Gran Premio)');
       scelta.appendChild(o);
     });
     if(classifica.length){
