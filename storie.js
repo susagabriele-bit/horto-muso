@@ -51,7 +51,7 @@
         gs:r.dataset.gs!=null?+r.dataset.gs:null,
         marcatori:m?m.textContent.replace(/^\s*Gol:\s*/i,'').trim():'',
         scena:r.dataset.scena||'',
-        scenaFotofinish:r.dataset.scenaFotofinish||r.dataset.scena||''
+        scenaFotofinish:r.dataset.scenaFotofinish||''
       };
     });
   }
@@ -127,15 +127,20 @@
     ctx.save();ctx.globalCompositeOperation='overlay';ctx.globalAlpha=.16;
     ctx.fillStyle=trama;ctx.fillRect(0,0,W,H);ctx.restore();
   }
-  // titolone sopra la scena: un'ombra lo stacca dai punti chiari dell'illustrazione
-  function titoloSuScena(testo,y){
-    ctx.save();ctx.shadowColor='rgba(0,0,0,.75)';ctx.shadowBlur=30;
-    scritta(testo,W/2,y,'900 {} '+TITOLO,180,BIANCO,980,6);
-    ctx.restore();
-  }
   function fascia(y){
     // fascia a strisce, come sotto i titoli del sito
     for(var i=0;i<6;i++){ctx.fillStyle=VERDE;ctx.fillRect(W/2-275+i*100,y,50,12)}
+  }
+  // la prima scena della lista che si riesce a caricare
+  function primaScena(lista){
+    return lista.reduce(function(prima,src){
+      return prima.then(function(img){return img||caricaScena(src)});
+    },Promise.resolve(null));
+  }
+  function sceneDi(p){
+    if(p.gf==null)return [p.scena];
+    // il Fotofinish della linea "manifesto": scena della partita, se no quella pronta per l'esito, se no quella del Gran Premio
+    return p.scena||p.scenaFotofinish?[p.scenaFotofinish,'assets/scene/fotofinish-'+esitoDi(p).toLowerCase()+'.webp',p.scena]:[];
   }
   var scene={};
   function caricaScena(src){
@@ -154,9 +159,9 @@
     }
   }
   // riga in alto: stemma della Mazzola Cup e scritta, centrati insieme
-  function intestazione(testo){
+  function intestazione(testo,font){
     var lato=80,spazio=20;
-    spaziatura(8);ctx.font='600 40px '+TESTO;
+    spaziatura(font?4:8);ctx.font=font?'400 34px '+font:'600 40px '+TESTO;
     var tw=Math.min(ctx.measureText(testo).width,940-lato-spazio);
     var x=(W-(lato+spazio+tw))/2;
     if(torneo.complete&&torneo.naturalWidth)ctx.drawImage(torneo,x,282-lato/2,lato,lato);else{x-=(lato+spazio)/2}
@@ -187,37 +192,58 @@
     scritta('Campo Mazzola · Beinasco',W/2,1665,'600 {} '+TESTO,40,GRIGIO,940,1);
   }
 
+  // STILE MANIFESTO (storie con la scena): titolo in corsivo anni '70, il resto in lettere a bastoni pesanti,
+  // ogni scritta con una copia sfalsata in un altro inchiostro, come una serigrafia fuori registro
+  var CORSIVO='Shrikhand,'+TITOLO,LASTRA='"Alfa Slab One",'+TITOLO,ARANCIO='#e8641e';
+  function stampa(t,x,y,font,dim,colore,ombra,max,sfalso){
+    do{ctx.font='400 '+dim+'px '+font;dim-=4}while(max&&ctx.measureText(t).width>max&&dim>20);
+    var d=sfalso||Math.max(3,dim*.05);
+    ctx.fillStyle=ombra;ctx.fillText(t,x+d,y+d);
+    ctx.fillStyle=colore;ctx.fillText(t,x,y);
+  }
+  function titoloManifesto(t,y){
+    ctx.save();ctx.translate(W/2,y);ctx.rotate(-.05);
+    stampa(t,0,0,CORSIVO,170,BIANCO,ARANCIO,960,9);
+    ctx.restore();
+  }
+  function nomeManifesto(nome,y,dim){
+    var nostra=nome.toLowerCase()===NOI.toLowerCase();
+    stampa(nome.toUpperCase(),W/2,y,LASTRA,dim,nostra?ERBA:BIANCO,nostra?'#000':VERDE,940);
+  }
+
   function granPremioScena(p,img){
     sfondoScena(img);
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    intestazione('MAZZOLA CUP · GIRONE B');
-    titoloSuScena('GRAN PREMIO',460);
-    nomeSquadra(p.casa,1300,104);
-    ctx.fillStyle=VERDE;ctx.beginPath();ctx.arc(W/2,1362,46,0,Math.PI*2);ctx.fill();
-    ctx.textBaseline='middle';scritta('VS',W/2,1366,'900 {} '+TITOLO,48,BIANCO);ctx.textBaseline='alphabetic';
-    nomeSquadra(p.ospiti,1500,104);
-    fascia(1536);
-    scritta(giorno.format(p.inizio).toUpperCase(),W/2,1622,'700 {} '+TITOLO,68,BIANCO,960,3);
-    scritta('ORE '+ora.format(p.inizio)+' · BEINASCO',W/2,1694,'900 {} '+TITOLO,60,ERBA,960,3);
+    intestazione('MAZZOLA CUP · GIRONE B',LASTRA);
+    titoloManifesto('Gran Premio',470);
+    nomeManifesto(p.casa,1290,92);
+    stampa('contro',W/2,1368,CORSIVO,60,ARANCIO,'#000',600,3);
+    nomeManifesto(p.ospiti,1480,92);
+    fascia(1520);
+    stampa(giorno.format(p.inizio).toUpperCase(),W/2,1610,LASTRA,56,BIANCO,'#000',960,3);
+    stampa('ORE '+ora.format(p.inizio)+' · BEINASCO',W/2,1684,LASTRA,50,ERBA,'#000',960,3);
     grana();
   }
 
+  // "CiccioGamer 3, Tarallo 2" → "CiccioGamer 3 · Tarallo 2", con nome e numero sempre sulla stessa riga
+  function gol(m){return m.split(/,\s*/).map(function(x){return x.trim().replace(/\s+/g,'\u00a0')}).join(' · ')}
   function esitoDi(p){return p.gf>p.gs?'VITTORIA':p.gf<p.gs?'SCONFITTA':'PAREGGIO'}
 
   function fotofinishScena(p,img){
     sfondoScena(img);
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase());
-    titoloSuScena('FOTOFINISH',460);
-    scritta(esitoDi(p),W/2,1220,'900 {} '+TITOLO,58,p.gf>p.gs?ERBA:GRIGIO,940,10);
-    nomeSquadra(p.casa,1305,84);
-    scritta((p.punteggio||'').replace(/\s*[–-]\s*/,' – '),W/2,1490,'900 {} '+TITOLO,200,BIANCO,960,4);
-    nomeSquadra(p.ospiti,1580,84);
+    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase(),LASTRA);
+    titoloManifesto('Fotofinish',470);
+    var vinta=p.gf>p.gs,esito=esitoDi(p);
+    stampa(esito.charAt(0)+esito.slice(1).toLowerCase()+(vinta?'!':''),W/2,1246,CORSIVO,72,vinta?ERBA:BIANCO,vinta?'#000':ARANCIO,700,4);
+    nomeManifesto(p.casa,1330,72);
+    stampa((p.punteggio||'').replace(/\s*[–-]\s*/,' – '),W/2,1490,LASTRA,160,BIANCO,VERDE,960,8);
+    nomeManifesto(p.ospiti,1578,72);
     if(p.marcatori){
-      var dim=40,righe;
-      do{ctx.font='600 '+dim+'px '+TESTO;righe=aCapo('Gol: '+p.marcatori.replace(/,\s*/g,' · '),920);dim-=2}while(righe.length>2&&dim>26);
+      var dim=34,righe;
+      do{ctx.font='400 '+dim+'px '+LASTRA;righe=aCapo('GOL: '+gol(p.marcatori.toUpperCase()),920);dim-=2}while(righe.length>2&&dim>24);
       ctx.fillStyle=BIANCO;
-      righe.forEach(function(r,k){ctx.fillText(r,W/2,1645+k*(dim+12))});
+      righe.forEach(function(r,k){ctx.fillText(r,W/2,1644+k*(dim+12))});
     }
     grana();
   }
@@ -237,7 +263,7 @@
       fascia(1420);
       scritta('GOL',W/2,1505,'900 {} '+TITOLO,54,ERBA,940,6);
       var dim=46,righe;
-      do{ctx.font='600 '+dim+'px '+TESTO;righe=aCapo(p.marcatori.replace(/,\s*/g,' · '),900);dim-=2}while(righe.length>3&&dim>28);
+      do{ctx.font='600 '+dim+'px '+TESTO;righe=aCapo(gol(p.marcatori),900);dim-=2}while(righe.length>3&&dim>28);
       ctx.fillStyle=BIANCO;
       righe.forEach(function(r,k){ctx.fillText(r,W/2,1570+k*(dim+16))});
     }
@@ -284,7 +310,7 @@
     if(!p)return;
     var giocata=p.gf!=null,turno=++giri;
     immagine=null;
-    caricaScena(giocata?p.scenaFotofinish:p.scena).then(function(img){
+    primaScena(sceneDi(p).filter(Boolean)).then(function(img){
       if(turno!==giri)return; // nel frattempo è stata scelta un'altra partita
       if(giocata)fotofinish(p,img);else granPremio(p,img);
       var data=p.inizio.toISOString().slice(0,10);
@@ -324,7 +350,9 @@
   var fonts=document.fonts?Promise.all([
     document.fonts.load('900 100px "Big Shoulders Display"'),
     document.fonts.load('700 100px "Big Shoulders Display"'),
-    document.fonts.load('600 40px Barlow')
+    document.fonts.load('600 40px Barlow'),
+    document.fonts.load('400 100px Shrikhand'),
+    document.fonts.load('400 100px "Alfa Slab One"')
   ]).catch(function(){}):Promise.resolve();
   var stemmaPronto=Promise.all([logo,torneo].map(function(i){return i.decode?i.decode().catch(function(){}):null}));
 
