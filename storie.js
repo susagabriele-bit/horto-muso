@@ -1,7 +1,9 @@
-// STORIE INSTAGRAM: legge il calendario da index.html e disegna la storia (1080×1920) su un canvas.
-// Prima della partita: Gran Premio. A partita giocata (data-gf/data-gs presenti): Fotofinish con risultato e marcatori.
-// Se la riga del calendario ha data-scena (e per il Fotofinish data-scena-fotofinish) l'illustrazione fa da sfondo,
-// altrimenti restano le strisce dello scudo.
+// STORIE INSTAGRAM: legge calendario, rosa e classifica da index.html e disegna la storia (1080×1920) su un canvas.
+// Prima della partita: Gran Premio e I Partenti (convocati). A partita giocata (data-gf/data-gs presenti):
+// Fotofinish con risultato e marcatori, e il Cavallo di razza della serata. Più la classifica.
+// Ogni storia ha la sua scena in stile manifesto (assets/scene/): per il Gran Premio quella della partita
+// (data-scena sulla riga del calendario) o quella di riserva, per il Fotofinish quella della partita
+// (data-scena-fotofinish) o quella pronta per l'esito. Se una scena non si carica restano le strisce dello scudo.
 (function(){
   var W=1080,H=1920;
   var VERDE='#028947',ERBA='#1fcf6a',BIANCO='#f7f5ef',GRIGIO='#a9b3ad';
@@ -16,12 +18,14 @@
 
   var tela=document.getElementById('tela'),ctx=tela.getContext('2d');
   var scelta=document.getElementById('partita');
+  var boxPartenti=document.getElementById('scelta-partenti'),spunte=document.getElementById('spunte');
+  var boxCavallo=document.getElementById('scelta-cavallo'),sceltaGiocatore=document.getElementById('giocatore');
   var bottoneCondividi=document.getElementById('condividi');
   var linkScarica=document.getElementById('scarica');
   var stato=document.getElementById('stato');
   var logo=new Image();logo.src='assets/logo.png';
   var torneo=new Image();torneo.src='assets/mazzola.png';
-  var partite=[],classifica=[],aggiornata='',immagine=null,urlImmagine=null,nomeFile='horto-muso-storia.png';
+  var partite=[],classifica=[],rosa=[],aggiornata='',immagine=null,urlImmagine=null,nomeFile='horto-muso-storia.png';
 
   var giorno=new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Rome'});
   var breve=new Intl.DateTimeFormat('it-IT',{weekday:'short',day:'numeric',month:'short',timeZone:'Europe/Rome'});
@@ -67,16 +71,26 @@
     });
   }
 
-  // partita proposta all'apertura: quella di oggi, se no il risultato degli ultimi due giorni, se no la prossima
+  // la rosa: soprannome, numero di maglia e ruolo di ogni scheda .giocatore
+  function leggiRosa(html){
+    var doc=new DOMParser().parseFromString(html,'text/html');
+    return [].map.call(doc.querySelectorAll('.rosa .giocatore'),function(g){
+      var n=g.querySelector('.m-num'),r=g.querySelector('.ruolo-tag');
+      return {nome:g.querySelector('h3').textContent.trim(),num:n?n.textContent.trim():'',ruolo:r?r.textContent.trim():''};
+    });
+  }
+
+  // storia proposta all'apertura: la partita di oggi, se no il risultato degli ultimi due giorni, se no la prossima
   function predefinita(){
     if(/[?&]storia=classifica\b/.test(location.search)&&classifica.length)return 'classifica';
     var adesso=new Date(),oggi=adesso.toDateString();
-    for(var i=0;i<partite.length;i++)if(partite[i].inizio.toDateString()===oggi)return i;
+    function tipo(i){return (partite[i].gf!=null?'fotofinish:':'granpremio:')+i}
+    for(var i=0;i<partite.length;i++)if(partite[i].inizio.toDateString()===oggi)return tipo(i);
     var ultimaGiocata=-1;
     partite.forEach(function(p,i){if(p.gf!=null)ultimaGiocata=i});
-    if(ultimaGiocata>=0&&adesso-partite[ultimaGiocata].inizio<2*864e5)return ultimaGiocata;
-    for(var j=0;j<partite.length;j++)if(partite[j].gf==null&&partite[j].inizio>adesso)return j;
-    return ultimaGiocata>=0?ultimaGiocata:0;
+    if(ultimaGiocata>=0&&adesso-partite[ultimaGiocata].inizio<2*864e5)return tipo(ultimaGiocata);
+    for(var j=0;j<partite.length;j++)if(partite[j].gf==null&&partite[j].inizio>adesso)return tipo(j);
+    return tipo(ultimaGiocata>=0?ultimaGiocata:0);
   }
 
   // --- disegno ---
@@ -115,6 +129,24 @@
     g.addColorStop(.66,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,.97)');
     ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   }
+  // scena rimpicciolita: la fascia [da,a] della scena (dove sta il disegno, in pixel della scena 1080×1920)
+  // finisce tra le righe y0 e y1 della storia, centrata; intorno il colore del fondo della scena
+  function scenaRiquadro(img,da,a,y0,y1){
+    ctx.drawImage(img,0,0,W,H);
+    var f=ctx.getImageData(W/2,120,1,1).data;
+    ctx.fillStyle='rgb('+f[0]+','+f[1]+','+f[2]+')';ctx.fillRect(0,0,W,H);
+    var k=(y1-y0)/(a-da),w=Math.round(W*k),h=Math.round(H*k);
+    // i bordi della scena sfumano nel fondo, così non si vede il riquadro della carta
+    var t=document.createElement('canvas');t.width=w;t.height=h;
+    var c=t.getContext('2d');c.drawImage(img,0,0,w,h);
+    c.globalCompositeOperation='destination-in';
+    [[w,0],[0,h]].forEach(function(d){
+      var g=c.createLinearGradient(0,0,d[0],d[1]);
+      g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.14,'#000');g.addColorStop(.86,'#000');g.addColorStop(1,'rgba(0,0,0,0)');
+      c.fillStyle=g;c.fillRect(0,0,w,h);
+    });
+    ctx.drawImage(t,(W-w)/2,y0-da*k);
+  }
   // grana di stampa sopra tutta la storia: scritte e disegno sembrano usciti dalla stessa serigrafia
   var trama=null;
   function grana(){
@@ -137,10 +169,15 @@
       return prima.then(function(img){return img||caricaScena(src)});
     },Promise.resolve(null));
   }
-  function sceneDi(p){
-    if(p.gf==null)return [p.scena];
-    // il Fotofinish della linea "manifesto": scena della partita, se no quella pronta per l'esito, se no quella del Gran Premio
-    return p.scena||p.scenaFotofinish?[p.scenaFotofinish,'assets/scene/fotofinish-'+esitoDi(p).toLowerCase()+'.webp',p.scena]:[];
+  var SCENA={
+    granpremio:'assets/scene/gran-premio.webp',classifica:'assets/scene/classifica.webp',
+    partenti:'assets/scene/partenti.webp',cavallo:'assets/scene/cavallo-di-razza.webp'
+  };
+  function sceneDi(tipo,p){
+    if(tipo==='granpremio')return [p.scena,SCENA.granpremio];
+    // Fotofinish: scena della partita, se no quella pronta per l'esito
+    if(tipo==='fotofinish')return [p.scenaFotofinish,'assets/scene/fotofinish-'+esitoDi(p).toLowerCase()+'.webp'];
+    return [SCENA[tipo]];
   }
   var scene={};
   function caricaScena(src){
@@ -296,28 +333,140 @@
     if(aggiornata)scritta('Aggiornata a '+aggiornata,W/2,Math.min(top+classifica.length*h+60,1665),'600 {} '+TESTO,38,GRIGIO,940,1);
   }
 
+  function avversario(p){return p.casa.toLowerCase()===NOI.toLowerCase()?p.ospiti:p.casa}
+
+  function classificaManifesto(img){
+    scenaRiquadro(img,350,1043,340,700);
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    intestazione('MAZZOLA CUP · GIRONE B',LASTRA);
+    titoloManifesto('Classifica',800);
+    var x0=70,x1=W-70,top=860,h=Math.min(78,760/Math.max(classifica.length,1));
+    ctx.textBaseline='middle';
+    ctx.textAlign='right';
+    stampa('G',x1-150,top+16,LASTRA,28,GRIGIO,'#000',0,2);
+    stampa('PT',x1-20,top+16,LASTRA,28,GRIGIO,'#000',0,2);
+    top+=40;
+    classifica.forEach(function(s,i){
+      var y=top+i*h,cy=y+h/2;
+      if(s.noi){ctx.fillStyle=VERDE;ctx.fillRect(x0-20,y+4,x1-x0+40,h-8)}
+      else{ctx.fillStyle='rgba(247,245,239,.18)';ctx.fillRect(x0,y,x1-x0,2)}
+      ctx.textAlign='left';
+      stampa(s.pos,x0+4,cy+2,LASTRA,44,s.noi?BIANCO:ARANCIO,'#000',0,2);
+      stampa(s.nome.toUpperCase(),x0+80,cy+2,LASTRA,44,BIANCO,s.noi?'#000':VERDE,620,3);
+      ctx.textAlign='right';
+      stampa(s.g,x1-150,cy+2,LASTRA,40,s.noi?BIANCO:GRIGIO,'#000',0,2);
+      stampa(s.pt,x1-20,cy+2,LASTRA,48,s.noi?BIANCO:ERBA,'#000',0,3);
+    });
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    if(aggiornata)stampa('Aggiornata a '+aggiornata,W/2,Math.min(top+classifica.length*h+56,1700),CORSIVO,40,GRIGIO,'#000',940,2);
+    grana();
+  }
+
+  function partenti(p,img,nomi){
+    scenaRiquadro(img,360,1023,330,760);
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase(),LASTRA);
+    titoloManifesto('I Partenti',860);
+    stampa('contro',W/2,935,CORSIVO,50,ARANCIO,'#000',600,3);
+    stampa(avversario(p).toUpperCase(),W/2,1010,LASTRA,70,BIANCO,VERDE,940);
+    fascia(1040);
+    // i convocati in due colonne: numero di maglia nel riquadro verde, poi il soprannome
+    var giocatori=rosa.filter(function(g){return nomi.indexOf(g.nome)>=0}),righe=Math.ceil(giocatori.length/2);
+    var passo=righe>1?Math.min(76,470/(righe-1)):0;
+    giocatori.forEach(function(g,i){
+      var col=i<righe?0:1,riga=col?i-righe:i,x=col?570:70,y=1120+riga*passo;
+      ctx.fillStyle=VERDE;ctx.fillRect(x,y-44,74,56);
+      ctx.textAlign='center';stampa(g.num,x+37,y,LASTRA,40,BIANCO,'#000',70,2);
+      ctx.textAlign='left';stampa(g.nome.toUpperCase(),x+92,y,LASTRA,44,BIANCO,'#000',360,3);
+    });
+    ctx.textAlign='center';
+    // allenatore e data subito sotto l'elenco, anche quando i convocati sono pochi
+    var y=Math.min(1120+Math.max(righe-1,0)*passo+100,1650);
+    var mister=rosa.filter(function(g){return /allenatore/i.test(g.ruolo)})[0];
+    if(mister){stampa('ALLENATORE · '+mister.nome.toUpperCase(),W/2,y,LASTRA,40,ERBA,'#000',940,2);y+=58}
+    stampa(giorno.format(p.inizio).toUpperCase()+' · ORE '+ora.format(p.inizio),W/2,y,LASTRA,40,BIANCO,'#000',960,2);
+    grana();
+  }
+
+  // gol segnati da un giocatore nella partita, letti dai marcatori ("CiccioGamer 3, Tarallo 2")
+  function golDi(p,nome){
+    var n=0;
+    (p.marcatori||'').split(/,\s*/).forEach(function(x){
+      var m=x.trim().match(/^(.*?)(?:\s+(\d+))?$/);
+      if(m&&m[1].toLowerCase()===nome.toLowerCase())n+=m[2]?+m[2]:1;
+    });
+    return n;
+  }
+  function capocannoniere(p){
+    var meglio=null,max=0;
+    rosa.forEach(function(g){var n=golDi(p,g.nome);if(n>max){max=n;meglio=g.nome}});
+    return meglio;
+  }
+
+  function cavalloDiRazza(p,img,nome){
+    var g=rosa.filter(function(x){return x.nome===nome})[0]||{nome:nome,num:''};
+    scenaRiquadro(img,351,1235,570,1170);
+    ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase(),LASTRA);
+    titoloManifesto('Cavallo di razza',450);
+    stampa('della serata',W/2,540,CORSIVO,60,ARANCIO,'#000',600,3);
+    stampa(g.nome.toUpperCase(),W/2,1290,LASTRA,120,ERBA,'#000',960,6);
+    var n=golDi(p,g.nome),dettagli=[];
+    if(g.num!=='')dettagli.push('NUMERO '+g.num);
+    if(n)dettagli.push(n+' GOL');
+    if(dettagli.length)stampa(dettagli.join(' · '),W/2,1370,LASTRA,50,BIANCO,'#000',940,3);
+    fascia(1410);
+    stampa(p.casa.toUpperCase()+'  '+(p.punteggio||'').replace(/\s*[–-]\s*/,'–')+'  '+p.ospiti.toUpperCase(),W/2,1500,LASTRA,54,BIANCO,VERDE,960,3);
+    grana();
+  }
+
+  // controlli in più: i convocati per I Partenti, il giocatore per il Cavallo di razza
+  function mostraControlli(tipo,p){
+    boxPartenti.hidden=tipo!=='partenti';
+    boxCavallo.hidden=tipo!=='cavallo';
+    if(tipo==='cavallo'&&p&&sceltaGiocatore.dataset.partita!==String(partite.indexOf(p))){
+      sceltaGiocatore.dataset.partita=partite.indexOf(p);
+      sceltaGiocatore.value=capocannoniere(p)||sceltaGiocatore.options[0].value;
+    }
+  }
+  function convocati(){
+    return [].filter.call(spunte.querySelectorAll('input'),function(c){return c.checked}).map(function(c){return c.value});
+  }
+
   var giri=0;
   function disegna(){
-    if(scelta.value==='classifica'){
-      giri++;
-      storiaClassifica();
-      nomeFile='horto-muso-classifica.png';
-      var n=classifica.filter(function(s){return s.noi})[0];
-      tela.setAttribute('aria-label','Storia della classifica del girone B'+(n?': Horto Muso '+n.pos+'° con '+n.pt+' punti':''));
-      prepara();return;
-    }
-    var p=partite[+scelta.value];
-    if(!p)return;
-    var giocata=p.gf!=null,turno=++giri;
+    var parti=scelta.value.split(':'),tipo=parti[0],p=partite[+parti[1]];
+    if(tipo!=='classifica'&&!p)return;
+    mostraControlli(tipo,p);
+    var turno=++giri;
     immagine=null;
-    primaScena(sceneDi(p).filter(Boolean)).then(function(img){
-      if(turno!==giri)return; // nel frattempo è stata scelta un'altra partita
-      if(giocata)fotofinish(p,img);else granPremio(p,img);
-      var data=p.inizio.toISOString().slice(0,10);
-      nomeFile='horto-muso-'+(giocata?'fotofinish':'gran-premio')+'-'+data+'.png';
-      tela.setAttribute('aria-label',giocata
-        ?'Storia del fotofinish: '+p.casa+' '+p.punteggio+' '+p.ospiti+(p.marcatori?'. Gol: '+p.marcatori:'')
-        :'Storia del Gran Premio: '+p.casa+' contro '+p.ospiti+', '+giorno.format(p.inizio)+' alle '+ora.format(p.inizio)+', campo Mazzola di Beinasco');
+    primaScena(sceneDi(tipo,p).filter(Boolean)).then(function(img){
+      if(turno!==giri)return; // nel frattempo è stata scelta un'altra storia
+      var data=p?p.inizio.toISOString().slice(0,10):'',etichetta;
+      if(tipo==='classifica'){
+        if(img)classificaManifesto(img);else storiaClassifica();
+        var n=classifica.filter(function(s){return s.noi})[0];
+        etichetta='Storia della classifica del girone B'+(n?': Horto Muso '+n.pos+'° con '+n.pt+' punti':'');
+        nomeFile='horto-muso-classifica.png';
+      }else if(tipo==='partenti'){
+        var nomi=convocati();
+        if(img)partenti(p,img,nomi);else granPremio(p,null);
+        etichetta='Storia dei partenti contro '+avversario(p)+': '+nomi.join(', ');
+        nomeFile='horto-muso-partenti-'+data+'.png';
+      }else if(tipo==='cavallo'){
+        if(img)cavalloDiRazza(p,img,sceltaGiocatore.value);else fotofinish(p,null);
+        etichetta='Storia del cavallo di razza della serata: '+sceltaGiocatore.value+', '+p.casa+' '+p.punteggio+' '+p.ospiti;
+        nomeFile='horto-muso-cavallo-di-razza-'+data+'.png';
+      }else if(tipo==='fotofinish'){
+        fotofinish(p,img);
+        etichetta='Storia del fotofinish: '+p.casa+' '+p.punteggio+' '+p.ospiti+(p.marcatori?'. Gol: '+p.marcatori:'');
+        nomeFile='horto-muso-fotofinish-'+data+'.png';
+      }else{
+        granPremio(p,img);
+        etichetta='Storia del Gran Premio: '+p.casa+' contro '+p.ospiti+', '+giorno.format(p.inizio)+' alle '+ora.format(p.inizio)+', campo Mazzola di Beinasco';
+        nomeFile='horto-muso-gran-premio-'+data+'.png';
+      }
+      tela.setAttribute('aria-label',etichetta);
       prepara();
     });
   }
@@ -346,6 +495,8 @@
   });
   linkScarica.addEventListener('click',function(e){if(!urlImmagine)e.preventDefault()});
   scelta.addEventListener('change',function(){stato.textContent='';disegna()});
+  spunte.addEventListener('change',disegna);
+  sceltaGiocatore.addEventListener('change',disegna);
 
   var fonts=document.fonts?Promise.all([
     document.fonts.load('900 100px "Big Shoulders Display"'),
@@ -359,17 +510,36 @@
   fetch('index.html',{cache:'no-cache'}).then(function(r){return r.text()}).then(function(html){
     partite=leggi(html);
     classifica=leggiClassifica(html);
-    partite.forEach(function(p,i){
-      var o=document.createElement('option');
-      o.value=i;
-      o.textContent=breve.format(p.inizio)+' · '+(p.gf!=null?p.casa+' '+p.punteggio+' '+p.ospiti:p.casa+' – '+p.ospiti+' (Gran Premio)');
-      scelta.appendChild(o);
-    });
-    if(classifica.length){
-      var c=document.createElement('option');
-      c.value='classifica';c.textContent='Classifica girone B'+(aggiornata?' · '+aggiornata:'');
-      scelta.appendChild(c);
+    rosa=leggiRosa(html);
+    // l'elenco delle storie, diviso per tipo
+    function gruppo(etichetta,voci){
+      var nome=etichetta.split(' · ')[0];
+      if(!voci.length)return;
+      var g=document.createElement('optgroup');g.label=etichetta;
+      voci.forEach(function(v){var o=document.createElement('option');o.value=v[0];o.textContent=nome+' · '+v[1];g.appendChild(o)});
+      scelta.appendChild(g);
     }
+    function voci(tipo,giocate){
+      return partite.map(function(p,i){return [p,i]}).filter(function(x){return (x[0].gf!=null)===giocate}).map(function(x){
+        var p=x[0];
+        return [tipo+':'+x[1],breve.format(p.inizio)+' · '+(giocate?p.casa+' '+p.punteggio+' '+p.ospiti:p.casa+' – '+p.ospiti)];
+      });
+    }
+    gruppo('Gran Premio · prima della partita',voci('granpremio',false));
+    gruppo('I Partenti · i convocati',voci('partenti',false));
+    gruppo('Fotofinish · il risultato',voci('fotofinish',true).reverse());
+    gruppo('Cavallo di razza · il migliore in campo',voci('cavallo',true).reverse());
+    if(classifica.length)gruppo('Classifica',[['classifica','Girone B'+(aggiornata?' · '+aggiornata:'')]]);
+    // convocati: tutta la rosa tranne l'allenatore, spuntati; il giocatore del Cavallo di razza
+    rosa.forEach(function(g){
+      if(/allenatore/i.test(g.ruolo))return;
+      var l=document.createElement('label'),c=document.createElement('input');
+      c.type='checkbox';c.value=g.nome;c.checked=true;
+      l.appendChild(c);l.appendChild(document.createTextNode(' '+g.nome));
+      spunte.appendChild(l);
+      var o=document.createElement('option');o.value=g.nome;o.textContent=g.nome+(g.num!==''?' · '+g.num:'');
+      sceltaGiocatore.appendChild(o);
+    });
     scelta.value=predefinita();
     return Promise.all([fonts,stemmaPronto]);
   }).then(disegna).catch(function(){
