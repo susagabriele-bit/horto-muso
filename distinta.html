@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Distinta · Horto Muso</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="versione" content="20261110144658">
+<meta name="versione" content="20261110145843">
 <meta name="theme-color" content="#028947">
 <link rel="icon" href="assets/logo-192.png" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
@@ -39,6 +39,11 @@ padding:.9rem 1rem;border-radius:6px;border:2px solid var(--verde);cursor:pointe
 .secondario:hover{border-color:var(--erba)}
 .stato{min-height:1.5em;color:var(--erba);font-weight:600}
 .scorre{overflow-x:auto;border-radius:6px}
+.azioni-una{grid-template-columns:1fr}
+.documenti{display:grid;grid-template-columns:1fr auto;gap:.6rem .7rem;align-items:end}
+.documenti .privacy{grid-column:1/-1}
+input[type=password]{font:600 1rem Barlow,system-ui,sans-serif;color:var(--bianco);background:var(--carta);border:2px solid var(--verde);border-radius:6px;padding:.7rem .8rem;width:100%}
+.link{background:none;border:0;padding:0;min-height:0;font:600 .92rem Barlow,system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--erba);text-decoration:underline;cursor:pointer}
 
 /* IL FOGLIO: come la distinta stampata del torneo, nero su bianco */
 .foglio{background:#fff;color:#000;font:400 13px/1.25 Georgia,"Times New Roman",serif;padding:28px 30px 34px;min-width:620px;border-radius:6px}
@@ -86,10 +91,17 @@ padding:.9rem 1rem;border-radius:6px;border:2px solid var(--verde);cursor:pointe
     <legend>Convocati</legend>
     <div class="spunte" id="spunte"></div>
   </fieldset>
-  <p class="privacy">I numeri dei documenti si scrivono direttamente nel foglio qui sotto e restano <b>solo su questo telefono</b>: non finiscono sul sito né vengono inviati a nessuno. Se preferisci, lasciali vuoti e compilali a penna.</p>
-  <div class="azioni">
+  <form class="documenti" id="sblocca" hidden>
+    <label>Documenti della squadra
+      <input id="parola" type="password" autocomplete="current-password" placeholder="Parola d’ordine della squadra">
+    </label>
+    <button class="secondario" type="submit">Apri</button>
+    <p class="privacy">I documenti sono sul sito solo cifrati: servono la parola d’ordine della squadra per leggerli. Basta inserirla una volta, poi questo telefono la ricorda.</p>
+  </form>
+  <p class="privacy" id="documenti-aperti" hidden>Documenti della squadra caricati. Per correggerne uno scrivi direttamente nel foglio: la correzione resta solo su questo telefono. <button class="link" id="blocca" type="button">Togli i documenti da questo telefono</button></p>
+  <p class="privacy" id="documenti-locali" hidden>Scrivi i numeri dei documenti direttamente nel foglio qui sotto: restano <b>solo su questo telefono</b> e la volta dopo li ritrovi già compilati.</p>
+  <div class="azioni azioni-una">
     <button class="principale" id="stampa" type="button">Stampa o PDF</button>
-    <button class="secondario" id="cancella" type="button">Cancella documenti</button>
   </div>
   <p class="stato" id="stato" role="status"></p>
   <div class="scorre">
@@ -115,7 +127,7 @@ padding:.9rem 1rem;border-radius:6px;border:2px solid var(--verde);cursor:pointe
     </article>
   </div>
 </main>
-<script src="distinta.js?v=20261110144658" defer></script>
-<script src="aggiorna.js?v=20261110144658" defer></script>
+<script src="distinta.js?v=20261110145843" defer></script>
+<script src="aggiorna.js?v=20261110145843" defer></script>
 </body>
 </html>

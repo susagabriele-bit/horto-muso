@@ -81,7 +81,7 @@
     var doc=new DOMParser().parseFromString(html,'text/html');
     return [].map.call(doc.querySelectorAll('.rosa .giocatore'),function(g){
       var n=g.querySelector('.m-num'),r=g.querySelector('.ruolo-tag');
-      return {nome:g.querySelector('h3').textContent.trim(),num:n?n.textContent.trim():'',ruolo:r?r.textContent.trim():''};
+      return {nome:g.querySelector('h3').textContent.trim(),num:n?n.textContent.trim():'',ruolo:r?r.textContent.trim():'',assente:g.hasAttribute('data-assente')};
     });
   }
 
@@ -545,7 +545,7 @@
     rosa.forEach(function(g){
       if(/allenatore/i.test(g.ruolo))return;
       var l=document.createElement('label'),c=document.createElement('input');
-      c.type='checkbox';c.value=g.nome;c.checked=true;
+      c.type='checkbox';c.value=g.nome;c.checked=!g.assente;
       l.appendChild(c);l.appendChild(document.createTextNode(' '+g.nome));
       spunte.appendChild(l);
       var o=document.createElement('option');o.value=g.nome;o.textContent=g.nome+(g.num!==''?' · '+g.num:'');

@@ -1,7 +1,10 @@
 // DISTINTA: legge calendario e rosa da index.html e compila il foglio del torneo per la partita scelta.
-// I numeri dei documenti NON sono nel sito: si scrivono nel foglio e restano solo in questo browser (localStorage).
+// I documenti della squadra stanno in assets/documenti.json solo cifrati (tools/cifra_documenti.mjs): si leggono
+// con la parola d'ordine della squadra, che questo telefono ricorda dopo la prima volta. Le correzioni scritte
+// a mano nel foglio restano solo in questo browser (localStorage) e valgono sopra quelle della squadra.
 (function(){
-  var RIGHE=17,DIRIGENTI=3,CHIAVE='distinta-documenti';
+  var RIGHE=17,DIRIGENTI=3,CHIAVE='distinta-documenti',CHIAVE_PAROLA='distinta-parola';
+  var squadra={}; // documenti della squadra, una volta decifrati
   var scelta=document.getElementById('partita'),spunte=document.getElementById('spunte');
   var righe=document.getElementById('righe'),staff=document.getElementById('staff'),stato=document.getElementById('stato');
   var partite=[],rosa=[];
@@ -33,7 +36,7 @@
       var anagrafe=(g.querySelector('.anagrafe')||{}).textContent||'',p=anagrafe.trim().split(/\s+/);
       var n=g.querySelector('.m-num'),r=g.querySelector('.ruolo-tag');
       return {soprannome:g.querySelector('h3').textContent.trim(),cognome:p.slice(0,-1).join(' '),nome:p.slice(-1)[0]||'',
-        num:n?n.textContent.trim():'',allenatore:!!(r&&/allenatore/i.test(r.textContent))};
+        num:n?n.textContent.trim():'',allenatore:!!(r&&/allenatore/i.test(r.textContent)),assente:g.hasAttribute('data-assente')};
     });
   }
 
@@ -42,7 +45,7 @@
   function campoDocumento(chi,campo,etichetta,predefinito){
     var td=document.createElement('td');td.className='doc';
     var i=document.createElement('input');
-    i.value=(documenti()[chi]||{})[campo]||predefinito||'';
+    i.value=(documenti()[chi]||{})[campo]||(squadra[chi]||{})[campo]||predefinito||'';
     i.setAttribute('aria-label',etichetta);i.autocomplete='off';i.spellcheck=false;
     i.addEventListener('input',function(){salvaDocumento(chi,campo,i.value.trim())});
     td.appendChild(i);return td;
@@ -84,12 +87,45 @@
     document.title='Distinta '+p.casa+' – '+p.ospite+' · '+data.format(p.inizio);
   }
 
-  document.getElementById('stampa').addEventListener('click',function(){window.print()});
-  document.getElementById('cancella').addEventListener('click',function(){
-    if(!confirm('Cancellare i numeri dei documenti salvati su questo telefono?'))return;
-    try{localStorage.removeItem(CHIAVE)}catch(e){}
-    compila();stato.textContent='Documenti cancellati da questo telefono.';
+  // --- documenti della squadra: cifrati nel sito, si aprono con la parola d'ordine ---
+  var cassaforte=fetch('assets/documenti.json',{cache:'no-cache'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null});
+  var boxChiuso=document.getElementById('sblocca'),boxAperto=document.getElementById('documenti-aperti');
+  var campoParola=document.getElementById('parola');
+  function daB64(t){return Uint8Array.from(atob(t),function(c){return c.charCodeAt(0)})}
+  function apri(parola){
+    if(!window.crypto||!crypto.subtle)return Promise.reject(new Error('crypto'));
+    return cassaforte.then(function(c){
+      if(!c)throw new Error('assente');
+      return crypto.subtle.importKey('raw',new TextEncoder().encode(parola),'PBKDF2',false,['deriveKey']).then(function(base){
+        return crypto.subtle.deriveKey({name:'PBKDF2',salt:daB64(c.sale),iterations:c.iterazioni,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+      }).then(function(k){
+        return crypto.subtle.decrypt({name:'AES-GCM',iv:daB64(c.iv)},k,daB64(c.dati));
+      }).then(function(b){return JSON.parse(new TextDecoder().decode(b))});
+    });
+  }
+  function mostraDocumenti(aperti){boxChiuso.hidden=aperti;boxAperto.hidden=!aperti}
+  function sblocca(parola,ricorda){
+    stato.textContent='Apro i documenti…';
+    return apri(parola).then(function(d){
+      squadra=d;
+      if(ricorda)try{localStorage.setItem(CHIAVE_PAROLA,parola)}catch(e){}
+      mostraDocumenti(true);stato.textContent='';compila();
+    },function(e){
+      mostraDocumenti(false);
+      stato.textContent=e&&e.message==='crypto'?'Questo browser non apre i documenti: compilali a mano.':'Parola d’ordine sbagliata.';
+    });
+  }
+  document.getElementById('sblocca').addEventListener('submit',function(e){
+    e.preventDefault();
+    if(campoParola.value.trim())sblocca(campoParola.value.trim(),true);
   });
+  document.getElementById('blocca').addEventListener('click',function(){
+    try{localStorage.removeItem(CHIAVE_PAROLA);localStorage.removeItem(CHIAVE)}catch(e){}
+    squadra={};campoParola.value='';mostraDocumenti(false);compila();
+    stato.textContent='Documenti tolti da questo telefono.';
+  });
+
+  document.getElementById('stampa').addEventListener('click',function(){window.print()});
   scelta.addEventListener('change',compila);
   spunte.addEventListener('change',compila);
 
@@ -107,10 +143,17 @@
     rosa.forEach(function(g,i){
       if(g.allenatore)return;
       var l=document.createElement('label'),c=document.createElement('input');
-      c.type='checkbox';c.value=i;c.checked=true;
+      c.type='checkbox';c.value=i;c.checked=!g.assente;
       l.appendChild(c);l.appendChild(document.createTextNode(' '+g.soprannome));
       spunte.appendChild(l);
     });
     compila();
+    return cassaforte.then(function(c){
+      // senza documenti della squadra sul sito si scrivono nel foglio e restano su questo telefono
+      if(!c){document.getElementById('documenti-locali').hidden=false;return}
+      var ricordata=null;
+      try{ricordata=localStorage.getItem(CHIAVE_PAROLA)}catch(e){}
+      if(ricordata)sblocca(ricordata,false);else mostraDocumenti(false);
+    });
   }).catch(function(){stato.textContent='Non riesco a leggere il calendario: ricarica la pagina.'});
 })();
