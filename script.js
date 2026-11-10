@@ -216,12 +216,17 @@
   Object.keys(link).forEach(function(id){var s=document.getElementById(id);if(s)osservaSezioni.observe(s)});
 })();
 
-// ARRIVO DA UN LINK CON #sezione (es. "Torna al sito" dalle storie): salta lì subito, senza ripassare dal cavallo
+// ARRIVO DA UN LINK CON #sezione (es. "Torna al sito" dalle storie): salta lì subito, senza ripassare dal cavallo.
+// RICARICANDO invece si riparte sempre dal cavallo: il browser non torna dov'eri e il #sezione non resta nell'indirizzo.
 (function(){
+  if('scrollRestoration' in history)history.scrollRestoration='manual';
+  function pulisci(){if(location.hash&&history.replaceState)history.replaceState(null,'',location.pathname+location.search)}
+  var nav=performance.getEntriesByType?performance.getEntriesByType('navigation')[0]:null;
+  if(nav&&nav.type==='reload'){pulisci();scrollTo(0,0);return}
   var id=decodeURIComponent(location.hash.slice(1));
   var meta=id&&document.getElementById(id);
+  pulisci();
   if(!meta||meta.id==='top')return;
-  if('scrollRestoration' in history)history.scrollRestoration='manual';
   function vai(){meta.scrollIntoView({behavior:'instant',block:'start'})}
   vai();
   // dopo che foto e font hanno finito di caricare la pagina può essersi allungata: riallinea,
