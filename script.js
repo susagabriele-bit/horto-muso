@@ -216,12 +216,26 @@
   Object.keys(link).forEach(function(id){var s=document.getElementById(id);if(s)osservaSezioni.observe(s)});
 })();
 
-// ARRIVO DA UN LINK CON #sezione (es. "Torna al sito" dalle storie): salta lì subito, senza ripassare dal cavallo
+// ARRIVO DA UN LINK CON #sezione (es. "Torna al sito" dalle storie): salta lì subito, senza ripassare dal cavallo.
+// RICARICANDO invece si riparte sempre dal cavallo: il browser non torna dov'eri e il #sezione non resta nell'indirizzo.
+// Col tasto indietro (dalle storie, dalla distinta) il browser riporta invece dove eri, come sempre.
 (function(){
+  var ripristino='scrollRestoration' in history;
+  // il ritorno automatico al punto di prima si spegne solo per questo caricamento e si riaccende a pagina caricata,
+  // così il tasto indietro continua a riportare dove eri
+  function senzaRitorno(){
+    if(!ripristino)return;
+    history.scrollRestoration='manual';
+    addEventListener('load',function(){setTimeout(function(){history.scrollRestoration='auto'},300)});
+  }
+  function pulisci(){if(location.hash&&history.replaceState)history.replaceState(null,'',location.pathname+location.search)}
+  var nav=performance.getEntriesByType?performance.getEntriesByType('navigation')[0]:null;
+  if(nav&&nav.type==='reload'){senzaRitorno();pulisci();scrollTo(0,0);return}
   var id=decodeURIComponent(location.hash.slice(1));
   var meta=id&&document.getElementById(id);
+  pulisci();
   if(!meta||meta.id==='top')return;
-  if('scrollRestoration' in history)history.scrollRestoration='manual';
+  senzaRitorno();
   function vai(){meta.scrollIntoView({behavior:'instant',block:'start'})}
   vai();
   // dopo che foto e font hanno finito di caricare la pagina può essersi allungata: riallinea,
