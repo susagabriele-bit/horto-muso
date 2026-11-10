@@ -3,7 +3,8 @@
 // Fotofinish con risultato e marcatori, e il Cavallo di razza della serata. Più la classifica.
 // Ogni storia ha la sua scena in stile manifesto (assets/scene/): per il Gran Premio quella della partita
 // (data-scena sulla riga del calendario) o quella di riserva, per il Fotofinish quella della partita
-// (data-scena-fotofinish) o quella pronta per l'esito. Se una scena non si carica restano le strisce dello scudo.
+// (data-scena-fotofinish) o quella pronta per l'esito. Gran Premio, Fotofinish e classifica si possono fare anche
+// nello stile classico, le strisce dello scudo senza scena (che restano anche se una scena non si carica).
 (function(){
   var W=1080,H=1920;
   var VERDE='#028947',ERBA='#1fcf6a',BIANCO='#f7f5ef',GRIGIO='#a9b3ad';
@@ -20,6 +21,10 @@
   var scelta=document.getElementById('partita');
   var boxPartenti=document.getElementById('scelta-partenti'),spunte=document.getElementById('spunte');
   var boxCavallo=document.getElementById('scelta-cavallo'),sceltaGiocatore=document.getElementById('giocatore');
+  var boxStile=document.getElementById('scelta-stile');
+  // stile ricordato su questo telefono (solo una comodità: se il browser non salva, si riparte da Manifesto)
+  try{var salvato=localStorage.getItem('storie-stile');if(salvato)boxStile.querySelector('input[value="'+salvato+'"]').checked=true}catch(e){}
+  function classico(){return boxStile.querySelector('input:checked').value==='classico'}
   var bottoneCondividi=document.getElementById('condividi');
   var linkScarica=document.getElementById('scarica');
   var stato=document.getElementById('stato');
@@ -76,7 +81,7 @@
     var doc=new DOMParser().parseFromString(html,'text/html');
     return [].map.call(doc.querySelectorAll('.rosa .giocatore'),function(g){
       var n=g.querySelector('.m-num'),r=g.querySelector('.ruolo-tag');
-      return {nome:g.querySelector('h3').textContent.trim(),num:n?n.textContent.trim():'',ruolo:r?r.textContent.trim():''};
+      return {nome:g.querySelector('h3').textContent.trim(),num:n?n.textContent.trim():'',ruolo:r?r.textContent.trim():'',assente:g.hasAttribute('data-assente')};
     });
   }
 
@@ -216,7 +221,7 @@
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
     intestazione('MAZZOLA CUP · GIRONE B');
-    scritta('GRAN PREMIO',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
+    scritta('MATCHDAY',W/2,470,'900 {} '+TITOLO,190,BIANCO,980,6);
     stemma(W/2,510,440);
     nomeSquadra(p.casa,1080,130);
     // VS nel cerchio verde
@@ -290,7 +295,7 @@
     sfondo();
     ctx.textAlign='center';ctx.textBaseline='alphabetic';
     var esito=esitoDi(p);
-    intestazione('FOTOFINISH · '+breve.format(p.inizio).toUpperCase());
+    intestazione('MAZZOLA CUP · '+breve.format(p.inizio).toUpperCase());
     scritta(esito,W/2,470,'900 {} '+TITOLO,190,p.gf>p.gs?ERBA:BIANCO,980,6);
     stemma(W/2,510,340);
     nomeSquadra(p.casa,990,110);
@@ -424,6 +429,7 @@
   function mostraControlli(tipo,p){
     boxPartenti.hidden=tipo!=='partenti';
     boxCavallo.hidden=tipo!=='cavallo';
+    boxStile.hidden=!(tipo==='granpremio'||tipo==='fotofinish'||tipo==='classifica');
     if(tipo==='cavallo'&&p&&sceltaGiocatore.dataset.partita!==String(partite.indexOf(p))){
       sceltaGiocatore.dataset.partita=partite.indexOf(p);
       sceltaGiocatore.value=capocannoniere(p)||sceltaGiocatore.options[0].value;
@@ -440,7 +446,8 @@
     mostraControlli(tipo,p);
     var turno=++giri;
     immagine=null;
-    primaScena(sceneDi(tipo,p).filter(Boolean)).then(function(img){
+    var conScena=!(classico()&&!boxStile.hidden);
+    primaScena(conScena?sceneDi(tipo,p).filter(Boolean):[]).then(function(img){
       if(turno!==giri)return; // nel frattempo è stata scelta un'altra storia
       var data=p?p.inizio.toISOString().slice(0,10):'',etichetta;
       if(tipo==='classifica'){
@@ -460,11 +467,11 @@
       }else if(tipo==='fotofinish'){
         fotofinish(p,img);
         etichetta='Storia del fotofinish: '+p.casa+' '+p.punteggio+' '+p.ospiti+(p.marcatori?'. Gol: '+p.marcatori:'');
-        nomeFile='horto-muso-fotofinish-'+data+'.png';
+        nomeFile='horto-muso-'+(img?'fotofinish':'risultato')+'-'+data+'.png';
       }else{
         granPremio(p,img);
         etichetta='Storia del Gran Premio: '+p.casa+' contro '+p.ospiti+', '+giorno.format(p.inizio)+' alle '+ora.format(p.inizio)+', campo Mazzola di Beinasco';
-        nomeFile='horto-muso-gran-premio-'+data+'.png';
+        nomeFile='horto-muso-'+(img?'gran-premio':'matchday')+'-'+data+'.png';
       }
       tela.setAttribute('aria-label',etichetta);
       prepara();
@@ -497,6 +504,10 @@
   scelta.addEventListener('change',function(){stato.textContent='';disegna()});
   spunte.addEventListener('change',disegna);
   sceltaGiocatore.addEventListener('change',disegna);
+  boxStile.addEventListener('change',function(){
+    try{localStorage.setItem('storie-stile',boxStile.querySelector('input:checked').value)}catch(e){}
+    disegna();
+  });
 
   var fonts=document.fonts?Promise.all([
     document.fonts.load('900 100px "Big Shoulders Display"'),
@@ -534,7 +545,7 @@
     rosa.forEach(function(g){
       if(/allenatore/i.test(g.ruolo))return;
       var l=document.createElement('label'),c=document.createElement('input');
-      c.type='checkbox';c.value=g.nome;c.checked=true;
+      c.type='checkbox';c.value=g.nome;c.checked=!g.assente;
       l.appendChild(c);l.appendChild(document.createTextNode(' '+g.nome));
       spunte.appendChild(l);
       var o=document.createElement('option');o.value=g.nome;o.textContent=g.nome+(g.num!==''?' · '+g.num:'');

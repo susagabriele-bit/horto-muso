@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Storie Instagram · Horto Muso</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="versione" content="20261109235625">
+<meta name="versione" content="20261110150358">
 <meta name="theme-color" content="#028947">
 <link rel="icon" href="assets/logo-192.png" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
@@ -40,6 +40,9 @@ legend{font-weight:600;padding:0 .3rem}
 .spunte{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.3rem .8rem}
 .spunte label{display:flex;align-items:center;gap:.45rem;font-weight:400;min-height:2rem}
 .spunte input{width:1.15rem;height:1.15rem;accent-color:var(--erba)}
+.stile{display:flex;gap:1.4rem;align-items:center}
+.stile label{display:flex;align-items:center;gap:.45rem;min-height:2rem}
+.stile input{width:1.15rem;height:1.15rem;accent-color:var(--erba)}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -51,6 +54,11 @@ legend{font-weight:600;padding:0 .3rem}
   <label>Storia
     <select id="partita"></select>
   </label>
+  <fieldset id="scelta-stile" class="stile" hidden>
+    <legend>Stile</legend>
+    <label><input type="radio" name="stile" value="manifesto" checked> Manifesto</label>
+    <label><input type="radio" name="stile" value="classico"> Classico</label>
+  </fieldset>
   <fieldset id="scelta-partenti" hidden>
     <legend>Convocati</legend>
     <div class="spunte" id="spunte"></div>
@@ -68,7 +76,7 @@ legend{font-weight:600;padding:0 .3rem}
   <p class="stato" id="stato" role="status"></p>
   <p class="nota">Da telefono: tocca <b>Condividi</b> e scegli Instagram, poi Storia. Ricordati di taggare il Mazzola. Se Instagram non compare, tocca <b>Scarica</b> e carica l'immagine dal rullino.</p>
 </main>
-<script src="storie.js?v=20261109235625" defer></script>
-<script src="aggiorna.js?v=20261109235625" defer></script>
+<script src="storie.js?v=20261110150358" defer></script>
+<script src="aggiorna.js?v=20261110150358" defer></script>
 </body>
 </html>
