@@ -87,6 +87,50 @@
   if(g)g.textContent=pos+'°';
 })();
 
+// MARCATORI: somma i gol dalle righe "Gol: CiccioGamer 6, Tarallo 3" del calendario e fa la classifica della squadra
+(function(){
+  var lista=document.querySelector('[data-marcatori]');
+  if(!lista)return;
+  // numero di maglia dalla rosa, per soprannome
+  var maglie={};
+  document.querySelectorAll('.rosa .giocatore').forEach(function(g){
+    var n=g.querySelector('.m-num');maglie[g.querySelector('h3').textContent.trim().toLowerCase()]=n?n.textContent.trim():'';
+  });
+  var gol={},nomi={},partite={};
+  document.querySelectorAll('.match[data-gf] .marcatori').forEach(function(m){
+    m.textContent.replace(/^\s*Gol:\s*/i,'').split(/,\s*/).forEach(function(x){
+      var t=x.trim().match(/^(.*?)(?:\s+(\d+))?$/);
+      if(!t||!t[1])return;
+      var k=t[1].toLowerCase();
+      nomi[k]=nomi[k]||t[1];gol[k]=(gol[k]||0)+(t[2]?+t[2]:1);partite[k]=(partite[k]||0)+1;
+    });
+  });
+  var chi=Object.keys(gol).sort(function(a,b){return gol[b]-gol[a]||nomi[a].localeCompare(nomi[b],'it')});
+  if(!chi.length){lista.outerHTML='<p class="lead">Ancora nessun gol in calendario.</p>';return}
+  var max=gol[chi[0]],pos=0;
+  chi.forEach(function(k,i){
+    if(i===0||gol[k]<gol[chi[i-1]])pos=i+1; // a pari gol, stessa posizione
+    var li=document.createElement('li'),num=maglie[k]!=null?maglie[k]:'';
+    li.innerHTML='<span class="b-pos"></span>'+
+      '<svg viewBox="0 0 200 290" aria-hidden="true"><use href="#maglia-retro"/><text class="m-num" x="100" y="170"></text></svg>'+
+      '<span class="b-nome"><span class="b-partite"></span></span>'+
+      '<span class="b-gol"><small>gol</small></span>'+
+      '<span class="b-barra" aria-hidden="true"></span>';
+    li.querySelector('.b-pos').textContent=pos;
+    li.querySelector('text').textContent=num;
+    li.querySelector('.b-nome').insertBefore(document.createTextNode(nomi[k]),li.querySelector('.b-partite'));
+    li.querySelector('.b-partite').textContent='a segno in '+partite[k]+(partite[k]===1?' partita':' partite');
+    li.querySelector('.b-gol').insertBefore(document.createTextNode(gol[k]),li.querySelector('.b-gol small'));
+    li.querySelector('.b-barra').style.setProperty('--quota',Math.max(4,gol[k]/max*100)+'%');
+    lista.appendChild(li);
+  });
+  // il riquadro del menu: capocannoniere (o i capocannonieri a pari merito)
+  var primi=chi.filter(function(k){return gol[k]===max}).map(function(k){return nomi[k]});
+  var d=document.querySelector('[data-capocannoniere]'),g=document.querySelector('[data-gol-grande]');
+  if(d)d.textContent=(primi.length>2?primi.length+' a pari merito':primi.join(' e '))+' · '+max+' gol';
+  if(g)g.textContent=max;
+})();
+
 // COMPARSE: maglie, partite e foto entrano in scena quando arrivano sullo schermo
 (function(){
   if(!('IntersectionObserver' in window))return;

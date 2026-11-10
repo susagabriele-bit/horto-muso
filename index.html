@@ -7,14 +7,14 @@
 <meta name="description" content="Horto Muso, squadra di calcio a 5 della Mazzola Cup: rosa, calendario e foto di squadra.">
 <meta name="theme-color" content="#028947">
 <meta name="robots" content="noindex, nofollow">
-<meta name="versione" content="20261110151650">
+<meta name="versione" content="20261110154035">
 <link rel="icon" href="assets/logo-192.png" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Horto Muso">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600&display=swap">
-<link rel="stylesheet" href="style.css?v=20261110151650">
+<link rel="stylesheet" href="style.css?v=20261110154035">
 </head>
 <body>
 
@@ -78,6 +78,7 @@
   <a class="barra-logo" href="#top" aria-label="Torna all’inizio"><picture><source srcset="assets/logo-192.webp" type="image/webp"><img src="assets/logo-192.png" width="36" height="36" alt=""></picture></a>
   <a href="#partite">Partite</a>
   <a href="#classifica">Classifica</a>
+  <a href="#marcatori">Gol</a>
   <a href="#rosa">Rosa</a>
   <a href="#foto">Foto</a>
 </nav>
@@ -99,6 +100,14 @@
         <span class="r-numero" aria-hidden="true" data-posizione-grande></span>
         <span class="r-titolo">Classifica</span>
         <span class="r-dato" data-posizione>Girone B</span>
+        <span class="r-vai" aria-hidden="true">→</span>
+      </a>
+    </li>
+    <li>
+      <a class="riquadro r-marcatori" href="#marcatori">
+        <span class="r-numero" aria-hidden="true" data-gol-grande></span>
+        <span class="r-titolo">Marcatori</span>
+        <span class="r-dato" data-capocannoniere>Chi ha segnato</span>
         <span class="r-vai" aria-hidden="true">→</span>
       </a>
     </li>
@@ -232,6 +241,12 @@
       <span class="r-vai" aria-hidden="true">→</span>
     </a>
   </div>
+</section>
+
+<section id="marcatori">
+  <h2>Marcatori</h2>
+  <p class="lead">I gol dell’Horto Muso in campionato, contati dai marcatori del calendario: si aggiorna da solo a ogni risultato.</p>
+  <ol class="bomber" data-marcatori></ol>
 </section>
 
 <section id="rosa">
@@ -383,7 +398,7 @@
   Horto Muso · Calcio a 5 · Mazzola Cup
 </footer>
 
-<script src="script.js?v=20261110151650" defer></script>
-<script src="aggiorna.js?v=20261110151650" defer></script>
+<script src="script.js?v=20261110154035" defer></script>
+<script src="aggiorna.js?v=20261110154035" defer></script>
 </body>
 </html>
