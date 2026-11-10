@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { webcrypto as crypto } from 'node:crypto';
 
-const ITERAZIONI = 310000;
+const ITERAZIONI = 1000000; // lento apposta: rende costoso provare a indovinare la parola d'ordine
 const [, , sorgente] = process.argv;
 const parola = process.env.PAROLA;
 if (!sorgente || !parola) {

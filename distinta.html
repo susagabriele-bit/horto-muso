@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Distinta · Horto Muso</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="versione" content="20261110145843">
+<meta name="versione" content="20261110150358">
 <meta name="theme-color" content="#028947">
 <link rel="icon" href="assets/logo-192.png" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
@@ -40,6 +40,9 @@ padding:.9rem 1rem;border-radius:6px;border:2px solid var(--verde);cursor:pointe
 .stato{min-height:1.5em;color:var(--erba);font-weight:600}
 .scorre{overflow-x:auto;border-radius:6px}
 .azioni-una{grid-template-columns:1fr}
+.scelta{display:flex;flex-wrap:wrap;gap:.3rem 1.4rem}
+.scelta label{display:flex;align-items:center;gap:.45rem;font-weight:400;min-height:2rem}
+.scelta input{width:1.15rem;height:1.15rem;accent-color:var(--erba)}
 .documenti{display:grid;grid-template-columns:1fr auto;gap:.6rem .7rem;align-items:end}
 .documenti .privacy{grid-column:1/-1}
 input[type=password]{font:600 1rem Barlow,system-ui,sans-serif;color:var(--bianco);background:var(--carta);border:2px solid var(--verde);border-radius:6px;padding:.7rem .8rem;width:100%}
@@ -91,6 +94,11 @@ input[type=password]{font:600 1rem Barlow,system-ui,sans-serif;color:var(--bianc
     <legend>Convocati</legend>
     <div class="spunte" id="spunte"></div>
   </fieldset>
+  <fieldset id="con-documenti" class="scelta">
+    <legend>Documenti nella distinta</legend>
+    <label><input type="radio" name="documenti" value="si" checked> Sì, con carta d’identità</label>
+    <label><input type="radio" name="documenti" value="no"> No, li scrivo a penna</label>
+  </fieldset>
   <form class="documenti" id="sblocca" hidden>
     <label>Documenti della squadra
       <input id="parola" type="password" autocomplete="current-password" placeholder="Parola d’ordine della squadra">
@@ -127,7 +135,7 @@ input[type=password]{font:600 1rem Barlow,system-ui,sans-serif;color:var(--bianc
     </article>
   </div>
 </main>
-<script src="distinta.js?v=20261110145843" defer></script>
-<script src="aggiorna.js?v=20261110145843" defer></script>
+<script src="distinta.js?v=20261110150358" defer></script>
+<script src="aggiorna.js?v=20261110150358" defer></script>
 </body>
 </html>

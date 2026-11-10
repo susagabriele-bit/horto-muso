@@ -5,6 +5,10 @@
 (function(){
   var RIGHE=17,DIRIGENTI=3,CHIAVE='distinta-documenti',CHIAVE_PAROLA='distinta-parola';
   var squadra={}; // documenti della squadra, una volta decifrati
+  var cassaforteC=false,aperta=false; // c'è il file cifrato sul sito? è stato aperto?
+  var sceltaDoc=document.getElementById('con-documenti');
+  try{var dSalvato=localStorage.getItem('distinta-con-documenti');if(dSalvato)sceltaDoc.querySelector('input[value="'+dSalvato+'"]').checked=true}catch(e){}
+  function conDocumenti(){return sceltaDoc.querySelector('input:checked').value==='si'}
   var scelta=document.getElementById('partita'),spunte=document.getElementById('spunte');
   var righe=document.getElementById('righe'),staff=document.getElementById('staff'),stato=document.getElementById('stato');
   var partite=[],rosa=[];
@@ -43,6 +47,7 @@
   function cella(testo,classe){var td=document.createElement('td');if(classe)td.className=classe;td.textContent=testo;return td}
   // campo del documento: scritto nel foglio, ricordato su questo telefono
   function campoDocumento(chi,campo,etichetta,predefinito){
+    if(!conDocumenti())return cella(''); // distinta senza documenti: colonne vuote, da compilare a penna
     var td=document.createElement('td');td.className='doc';
     var i=document.createElement('input');
     i.value=(documenti()[chi]||{})[campo]||(squadra[chi]||{})[campo]||predefinito||'';
@@ -103,7 +108,14 @@
       }).then(function(b){return JSON.parse(new TextDecoder().decode(b))});
     });
   }
-  function mostraDocumenti(aperti){boxChiuso.hidden=aperti;boxAperto.hidden=!aperti}
+  // cosa mostrare sopra il foglio: parola d'ordine, documenti caricati o documenti da scrivere sul telefono
+  function aggiornaPannelli(){
+    var si=conDocumenti();
+    boxChiuso.hidden=!(si&&cassaforteC&&!aperta);
+    boxAperto.hidden=!(si&&aperta);
+    document.getElementById('documenti-locali').hidden=!(si&&!cassaforteC);
+  }
+  function mostraDocumenti(aperti){aperta=aperti;aggiornaPannelli()}
   function sblocca(parola,ricorda){
     stato.textContent='Apro i documenti…';
     return apri(parola).then(function(d){
@@ -127,6 +139,10 @@
 
   document.getElementById('stampa').addEventListener('click',function(){window.print()});
   scelta.addEventListener('change',compila);
+  sceltaDoc.addEventListener('change',function(){
+    try{localStorage.setItem('distinta-con-documenti',sceltaDoc.querySelector('input:checked').value)}catch(e){}
+    aggiornaPannelli();compila();
+  });
   spunte.addEventListener('change',compila);
 
   fetch('index.html',{cache:'no-cache'}).then(function(r){return r.text()}).then(function(html){
@@ -150,7 +166,8 @@
     compila();
     return cassaforte.then(function(c){
       // senza documenti della squadra sul sito si scrivono nel foglio e restano su questo telefono
-      if(!c){document.getElementById('documenti-locali').hidden=false;return}
+      cassaforteC=!!c;
+      if(!c){aggiornaPannelli();return}
       var ricordata=null;
       try{ricordata=localStorage.getItem(CHIAVE_PAROLA)}catch(e){}
       if(ricordata)sblocca(ricordata,false);else mostraDocumenti(false);
