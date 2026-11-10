@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Distinta · Horto Muso</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="versione" content="20261110144658">
+<meta name="theme-color" content="#028947">
+<link rel="icon" href="assets/logo-192.png" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;600&display=swap">
+<style>
+:root{--nero:#000;--verde:#028947;--erba:#1fcf6a;--bianco:#f7f5ef;--grigio:#a9b3ad;--carta:#0d1511;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--nero);color:var(--bianco);font:400 1rem/1.5 Barlow,system-ui,sans-serif;
+padding:max(1rem,env(safe-area-inset-top,0px)) max(1rem,env(safe-area-inset-right,0px)) max(2rem,env(safe-area-inset-bottom,0px)) max(1rem,env(safe-area-inset-left,0px))}
+:focus-visible{outline:3px solid var(--erba);outline-offset:3px}
+.pagina{max-width:46rem;margin:0 auto;display:grid;gap:1rem}
+h1{font:900 clamp(2.2rem,9vw,3rem)/.95 "Big Shoulders Display",Impact,sans-serif;margin:0}
+.torna{color:var(--grigio);font-weight:600;text-decoration:none}
+.torna:hover{color:var(--erba)}
+p{margin:0;color:var(--grigio)}
+label{font-weight:600;display:grid;gap:.35rem}
+select{font:600 1rem Barlow,system-ui,sans-serif;color:var(--bianco);background:var(--carta);border:2px solid var(--verde);border-radius:6px;padding:.7rem .8rem;width:100%}
+fieldset{border:2px solid var(--verde);border-radius:6px;padding:.6rem .8rem;margin:0}
+legend{font-weight:600;padding:0 .3rem}
+.spunte{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.3rem .8rem}
+.spunte label{display:flex;align-items:center;gap:.45rem;font-weight:400;min-height:2rem}
+.spunte input{width:1.15rem;height:1.15rem;accent-color:var(--erba)}
+.privacy{border-left:4px solid var(--erba);padding:.2rem 0 .2rem .8rem;font-size:.92rem}
+.azioni{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+button{font:700 1.15rem/1 "Big Shoulders Display",Impact,sans-serif;letter-spacing:.06em;text-transform:uppercase;
+padding:.9rem 1rem;border-radius:6px;border:2px solid var(--verde);cursor:pointer;min-height:3rem}
+.principale{background:var(--erba);border-color:var(--erba);color:var(--nero)}
+.secondario{background:none;color:var(--bianco)}
+.secondario:hover{border-color:var(--erba)}
+.stato{min-height:1.5em;color:var(--erba);font-weight:600}
+.scorre{overflow-x:auto;border-radius:6px}
+
+/* IL FOGLIO: come la distinta stampata del torneo, nero su bianco */
+.foglio{background:#fff;color:#000;font:400 13px/1.25 Georgia,"Times New Roman",serif;padding:28px 30px 34px;min-width:620px;border-radius:6px}
+.foglio .testa{text-align:center}
+.foglio .testa img{width:64px;height:64px}
+.foglio h2{font:400 26px/1.1 Georgia,"Times New Roman",serif;margin:10px 0 22px;letter-spacing:.02em;text-align:center}
+.foglio .squadre,.foglio .quando{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px;margin:0 20px 14px}
+.foglio .campo{display:flex;gap:10px;align-items:baseline}
+.foglio .campo b{font-weight:400;letter-spacing:.04em;flex:none}
+.foglio .campo span{flex:1;border-bottom:1px solid #000;min-height:1.3em;font-weight:700}
+.foglio table{width:100%;border-collapse:collapse;margin-top:16px}
+.foglio th,.foglio td{border:1px solid #000;padding:2px 6px;height:24px;text-align:left;vertical-align:middle}
+.foglio thead th{font-weight:700;font-size:12px;line-height:1.1;text-align:center}
+.foglio td.num{text-align:center;width:56px}
+.foglio td.doc input{width:100%;border:0;background:transparent;color:#000;font:inherit;padding:0}
+.foglio td.doc input:focus{outline:2px solid var(--verde);background:#eef8f2}
+.foglio .staff{width:88%;margin:26px auto 0}
+.foglio .staff th{text-align:left;width:120px;font-size:12px}
+.foglio .firme{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin:40px 20px 0}
+.foglio .firme div{border-top:1px solid #000;padding-top:4px;text-align:center}
+
+[hidden]{display:none!important}
+
+@page{size:A4 portrait;margin:12mm}
+@media print{
+  :root{color-scheme:light}
+  body{background:#fff;padding:0}
+  .pagina{display:block;max-width:none}
+  .pagina>*:not(.scorre){display:none!important}
+  .scorre{overflow:visible}
+  .foglio{min-width:0;padding:0;border-radius:0}
+  .foglio td.doc input{outline:none!important;background:none!important}
+}
+</style>
+</head>
+<body>
+<main class="pagina">
+  <a class="torna" href="./#partite">← Torna al sito</a>
+  <h1>Distinta</h1>
+  <p>Scegli la partita e spunta i convocati: il foglio si compila da solo col modello del torneo, pronto da stampare o da salvare in PDF.</p>
+  <label>Partita
+    <select id="partita"></select>
+  </label>
+  <fieldset>
+    <legend>Convocati</legend>
+    <div class="spunte" id="spunte"></div>
+  </fieldset>
+  <p class="privacy">I numeri dei documenti si scrivono direttamente nel foglio qui sotto e restano <b>solo su questo telefono</b>: non finiscono sul sito né vengono inviati a nessuno. Se preferisci, lasciali vuoti e compilali a penna.</p>
+  <div class="azioni">
+    <button class="principale" id="stampa" type="button">Stampa o PDF</button>
+    <button class="secondario" id="cancella" type="button">Cancella documenti</button>
+  </div>
+  <p class="stato" id="stato" role="status"></p>
+  <div class="scorre">
+    <article class="foglio" id="foglio" aria-label="Distinta della partita">
+      <div class="testa"><img src="assets/mazzola.png" alt="Mazzola Cup"></div>
+      <h2>DISTINTA MAZZOLA CUP</h2>
+      <div class="squadre">
+        <div class="campo"><b>CASA</b><span id="casa"></span></div>
+        <div class="campo"><b>OSPITE</b><span id="ospite"></span></div>
+      </div>
+      <div class="quando">
+        <div class="campo"><b>DATA</b><span id="data"></span></div>
+        <div class="campo"><b>ORA</b><span id="ora"></span></div>
+      </div>
+      <table>
+        <thead><tr><th scope="col">N°<br>MAGLIA</th><th scope="col">COGNOME</th><th scope="col">NOME</th><th scope="col">DOCUMENTO</th><th scope="col">N° DOCUMENTO</th><th scope="col">TESSERA N°</th></tr></thead>
+        <tbody id="righe"></tbody>
+      </table>
+      <table class="staff">
+        <tbody id="staff"></tbody>
+      </table>
+      <div class="firme"><div>Capitano</div><div>Arbitro</div></div>
+    </article>
+  </div>
+</main>
+<script src="distinta.js?v=20261110144658" defer></script>
+<script src="aggiorna.js?v=20261110144658" defer></script>
+</body>
+</html>
